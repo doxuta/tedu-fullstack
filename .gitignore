@@ -1,0 +1,35 @@
+# ── Bí mật / cấu hình cục bộ ──────────────────────────────
+.env
+*.env
+!.env.example
+
+# ── Dữ liệu Postgres cục bộ (KHÔNG BAO GIỜ commit) ────────
+server/tedu_db/
+*.pid
+
+# ── Phụ thuộc / build ─────────────────────────────────────
+node_modules/
+dist/
+build/
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# ── Rác trình soạn thảo / hệ điều hành ────────────────────
+.DS_Store
+.idea/
+*.iml
+.artifacts/
+
+# ── File tạm ──────────────────────────────────────────────
+*.timestamp-*.mjs
+deploy_netlify/
+
+# ── Flutter platform scaffolding (tạo lại bằng `flutter create .`) ──
+app/android/
+app/ios/
+app/macos/
+app/linux/
+app/windows/
+app/web/
+app/build/
