@@ -159,17 +159,36 @@ PreferredSizeWidget teduBar(BuildContext context, String title, {List<Widget>? a
   return AppBar(
     title: Row(mainAxisSize: MainAxisSize.min, children: [
       Flexible(child: Text(title, overflow: TextOverflow.ellipsis)),
-      const SizedBox(width: 8),
-      Tooltip(
-        message: st.realtimeOn
-            ? L.t('Trực tuyến — thiết bị khác đổi là thấy ngay', 'Live sync on', '실시간 동기화')
-            : L.t('Chưa nối realtime', 'Realtime off', '실시간 꺼짐'),
-        child: Container(
-          width: 8, height: 8,
-          decoration: BoxDecoration(shape: BoxShape.circle,
-              color: st.realtimeOn ? Ink2.green : Ink2.faint),
+      if (st.demo) ...[
+        const SizedBox(width: 8),
+        Tooltip(
+          message: L.t('Đang xem sổ mẫu — đăng xuất để về màn đăng nhập',
+              'Sample notebook — sign out to leave', '샘플 모드'),
+          child: Transform.rotate(
+            angle: -.06,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
+              decoration: BoxDecoration(border: Border.all(color: Ink2.gold, width: 1.4)),
+              child: const Text('DEMO',
+                  style: TextStyle(fontSize: 9.5, letterSpacing: 2,
+                      fontWeight: FontWeight.w900, color: Ink2.gold)),
+            ),
+          ),
         ),
-      ),
+      ],
+      if (!st.demo) ...[
+        const SizedBox(width: 8),
+        Tooltip(
+          message: st.realtimeOn
+              ? L.t('Trực tuyến — thiết bị khác đổi là thấy ngay', 'Live sync on', '실시간 동기화')
+              : L.t('Chưa nối realtime', 'Realtime off', '실시간 꺼짐'),
+          child: Container(
+            width: 8, height: 8,
+            decoration: BoxDecoration(shape: BoxShape.circle,
+                color: st.realtimeOn ? Ink2.green : Ink2.faint),
+          ),
+        ),
+      ],
     ]),
     bottom: PreferredSize(
       preferredSize: const Size.fromHeight(6),

@@ -145,6 +145,15 @@ class _ScoresScreenState extends State<ScoresScreen> {
             ),
           ],
           const SizedBox(height: 14),
+          if (filtered.isEmpty && !loading)
+            Padding(
+              padding: const EdgeInsets.all(24),
+              child: Text(
+                  L.t('Chưa có điểm nào — bấm "Thêm điểm" để ghi bài kiểm tra đầu tiên.',
+                      'No scores yet — tap "Add score" to record the first test.',
+                      '아직 점수가 없습니다.'),
+                  textAlign: TextAlign.center, style: const TextStyle(color: Ink2.muted, height: 1.6)),
+            ),
           for (final sc in filtered)
             Padding(
               padding: const EdgeInsets.only(bottom: 8),

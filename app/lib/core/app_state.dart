@@ -10,6 +10,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../data/models.dart';
 import 'api_client.dart';
+import 'demo_api.dart';
 import 'i18n.dart';
 
 String genUuid() {
@@ -35,6 +36,7 @@ class AppState extends ChangeNotifier {
   Map<String, dynamic> userSettings = {};
   bool isLoggedIn = false;
   bool online = true;
+  bool demo = false; // chế độ xem thử — dữ liệu mẫu trong máy, không cần server
 
   List<Student> students = [];
   List<ClassModel> classes = [];
@@ -49,6 +51,11 @@ class AppState extends ChangeNotifier {
   Future<void> init() async {
     _prefs = await SharedPreferences.getInstance();
     serverUrl = _prefs.getString('serverUrl') ?? serverUrl;
+    L.lang = _prefs.getString('lang') ?? 'vi';
+    if (_prefs.getString('demoMode') == '1') {
+      await _activateDemo();
+      return;
+    }
     api = ApiClient(baseUrl: serverUrl)
       ..accessToken = _prefs.getString('accessToken')
       ..refreshToken = _prefs.getString('refreshToken')
@@ -60,7 +67,6 @@ class AppState extends ChangeNotifier {
     userEmail = _prefs.getString('userEmail');
     userName = _prefs.getString('userName');
     userRole = _prefs.getString('userRole') ?? 'teacher';
-    L.lang = _prefs.getString('lang') ?? 'vi';
     try {
       final us = _prefs.getString('userSettings');
       if (us != null) userSettings = jsonDecode(us) as Map<String, dynamic>;
@@ -70,9 +76,52 @@ class AppState extends ChangeNotifier {
     if (isLoggedIn) { refreshAll(); _connectWs(); }
   }
 
+  /* ---------- chế độ demo (xem thử, không cần server) ---------- */
+  Future<void> enterDemo() async {
+    await _prefs.setString('demoMode', '1');
+    await _activateDemo();
+  }
+
+  Future<void> _activateDemo() async {
+    final demoApi = DemoApi();
+    demo = true;
+    online = true;
+    api = demoApi;
+    userEmail = 'mai.demo@tedu.vn';
+    userName = 'Cô Mai';
+    userRole = 'admin'; // để xem được cả màn Quản trị
+    userSettings = Map.of(demoApi.settings);
+    students = [];
+    classes = [];
+    pendingOps = [];
+    isLoggedIn = true;
+    notifyListeners();
+    await refreshAll();
+  }
+
+  Future<void> exitDemo() async {
+    await _prefs.remove('demoMode');
+    demo = false;
+    isLoggedIn = false;
+    userEmail = null;
+    userName = null;
+    userRole = 'teacher';
+    userSettings = {};
+    students = [];
+    classes = [];
+    pendingOps = [];
+    api = ApiClient(baseUrl: serverUrl)
+      ..onTokensRotated = (a, r) {
+        _prefs.setString('accessToken', a);
+        _prefs.setString('refreshToken', r);
+      }
+      ..onSessionExpired = () async => logout(local: true);
+    notifyListeners();
+  }
+
   /* ---------- realtime (WebSocket) ---------- */
   void _connectWs() {
-    if (kIsWeb || !isLoggedIn || api.accessToken == null) return;
+    if (demo || kIsWeb || !isLoggedIn || api.accessToken == null) return;
     _wsRetry?.cancel();
     final wsUrl = serverUrl.replaceFirst('http', 'ws');
     WebSocket.connect('$wsUrl/ws?token=${api.accessToken}').then((ws) {
@@ -146,6 +195,7 @@ class AppState extends ChangeNotifier {
   }
 
   Future<void> logout({bool local = false}) async {
+    if (demo) { await exitDemo(); return; }
     if (!local && api.refreshToken != null) {
       try { await api.post('/auth/logout', {'refreshToken': api.refreshToken!}); } catch (_) {}
     }
@@ -184,6 +234,7 @@ class AppState extends ChangeNotifier {
   }
 
   Future<void> _saveCache() async {
+    if (demo) return; // dữ liệu demo không ghi đè cache của tài khoản thật
     await _prefs.setString('cache.students',
         jsonEncode(students.map((e) => e.toJson()).toList()));
     await _prefs.setString('cache.classes',
@@ -327,7 +378,7 @@ class AppState extends ChangeNotifier {
 
   Future<void> saveUserSettings(Map<String, dynamic> patch) async {
     userSettings = {...userSettings, ...patch};
-    await _prefs.setString('userSettings', jsonEncode(userSettings));
+    if (!demo) await _prefs.setString('userSettings', jsonEncode(userSettings));
     notifyListeners();
     await _call(() => api.patch('/me', {'settings': userSettings}),
         {'method': 'PATCH', 'path': '/me', 'body': {'settings': userSettings}});

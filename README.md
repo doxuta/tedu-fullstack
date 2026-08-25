@@ -19,7 +19,7 @@
 |---|---|---|
 | **`TEdu-quan-ly-hoc-sinh.html`** | Toàn bộ web app trong **một file HTML** — mở là chạy, không cần cài gì | Vanilla JS · localStorage · IndexedDB · Firebase (tuỳ chọn) |
 | **`server/`** | API backend tự chủ (thay thế Firebase khi muốn tự host) | TypeScript · Hono · Drizzle ORM · PostgreSQL · WebSocket |
-| **`app/`** | Ứng dụng di động / desktop đa nền tảng | Flutter (iOS · Android · macOS · Windows · Linux) |
+| **`app/`** | Ứng dụng di động / desktop đa nền tảng — **có chế độ demo chạy ngay, không cần server** | Flutter (iOS · Android · macOS · Windows · Linux) |
 
 Ba phần **độc lập** — dùng riêng từng phần đều được. Web một-file là sản phẩm chính,
 server + app Flutter là phiên bản tự chủ hạ tầng.
@@ -87,18 +87,23 @@ cd server
 cp .env.example .env          # điền secret của bạn
 npm install
 npm run db:migrate
-npm run dev                   # http://localhost:3000
+npm run dev                   # http://localhost:8787
 npm test                      # vitest — bộ test API
 ```
 
-**App Flutter (cần Flutter SDK):**
+**App Flutter (chỉ cần Flutter SDK — không cần server):**
 ```bash
 cd app
 flutter create .              # sinh lại platform scaffolding (đã gitignore)
 flutter pub get
 flutter run                   # chọn thiết bị: iOS / Android / macOS...
 ```
-App trỏ tới server ở `app/lib/core/api_client.dart` (mặc định `localhost:3000`).
+Mở app → bấm **「 XEM THỬ BẢN DEMO 」**: sổ mẫu đầy đủ 12 học sinh, 6 ca học, 8 tuần
+điểm danh, học phí, biểu đồ điểm, giáo án, phiếu thu PDF — mọi thao tác chạy thật, offline 100%.
+Muốn dùng server thật: `./scripts/dev.sh` rồi trỏ máy chủ `http://localhost:8787` ở màn đăng nhập.
+Chi tiết + test + kiến trúc: **[app/README.md](app/README.md)**.
+
+![App Flutter — dashboard bản demo](docs/screenshots/app-flutter-dashboard.png)
 
 ---
 
@@ -139,7 +144,9 @@ TEDU/
 - **Server tự chủ** dành cho ai muốn thoát Firebase: Hono (nhẹ, chuẩn Web API), Drizzle
   (schema là code TypeScript), realtime qua WebSocket, kiểm thử bằng Vitest.
 - **Flutter một codebase** ra iOS/Android/desktop; bộ widget `vintage.dart` tái tạo đúng
-  ngôn ngữ giấy-mực-triện của web.
+  ngôn ngữ giấy-mực-triện của web. Chế độ demo là một `DemoApi` kế thừa `ApiClient` —
+  máy chủ giả trong bộ nhớ trả lời đúng các route REST của server thật, nên không màn hình
+  nào phải sửa để chạy offline.
 - **Bảo mật**: `.env` và thư mục dữ liệu Postgres không bao giờ vào git (xem `.gitignore`);
   apiKey Firebase trong file HTML là public identifier theo thiết kế của Firebase —
   quyền truy cập thật nằm ở Firestore Security Rules.

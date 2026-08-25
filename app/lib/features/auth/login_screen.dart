@@ -104,6 +104,27 @@ class _LoginScreenState extends State<LoginScreen> {
                             style: const TextStyle(color: Ink2.oxblood, fontSize: 13)),
                       ),
                       const Fleuron(),
+                      const SizedBox(height: 6),
+                      OutlinedButton.icon(
+                        onPressed: _busy
+                            ? null
+                            : () async {
+                                setState(() => _busy = true);
+                                await AppState.instance.enterDemo();
+                              },
+                        icon: const Icon(Icons.auto_stories_outlined, size: 17, color: Ink2.gold),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Ink2.ink,
+                          side: const BorderSide(color: Ink2.gold, width: 1.2),
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        ),
+                        label: const Text('XEM THỬ BẢN DEMO',
+                            style: TextStyle(fontSize: 12, letterSpacing: 2, fontWeight: FontWeight.w800)),
+                      ),
+                      const SizedBox(height: 6),
+                      const Text('Sổ mẫu đầy dữ liệu — không cần máy chủ, không cần tài khoản.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 11, color: Ink2.muted)),
                       const SizedBox(height: 8),
                       InkWell(
                         onTap: () => setState(() => _showServer = !_showServer),

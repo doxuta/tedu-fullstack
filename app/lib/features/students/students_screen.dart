@@ -47,6 +47,21 @@ class _StudentsScreenState extends State<StudentsScreen> {
                 onChanged: (v) => setState(() => _q = v),
               ),
             ),
+            if (list.isEmpty)
+              Expanded(
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Text(
+                        _q.isEmpty
+                            ? 'Sổ còn trống — bấm "Thêm học sinh" để ghi tên em đầu tiên ✎'
+                            : 'Không thấy ai khớp "$_q".',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(color: Ink2.muted, height: 1.6)),
+                  ),
+                ),
+              )
+            else
             Expanded(
               child: RefreshIndicator(
                 onRefresh: st.refreshAll,

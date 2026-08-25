@@ -134,6 +134,12 @@ class _FeesScreenState extends State<FeesScreen> {
           ),
           const SizedBox(height: 16),
           const SectionLabel('Từng học sinh'),
+          if (!loading && !rows.any((x) => x.sessions > 0 || x.paid > 0))
+            const Padding(
+              padding: EdgeInsets.all(24),
+              child: Text('Tháng này chưa có buổi học nào được điểm danh.\nĐiểm danh xong, học phí sẽ tự cộng vào đây.',
+                  textAlign: TextAlign.center, style: TextStyle(color: Ink2.muted, height: 1.6)),
+            ),
           for (final r in rows.where((x) => x.sessions > 0 || x.paid > 0))
             Padding(
               padding: const EdgeInsets.only(bottom: 10),

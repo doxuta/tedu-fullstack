@@ -31,7 +31,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
             const SizedBox(height: 2),
             DottedRow('Email', Text(st.userEmail ?? '')),
             const SizedBox(height: 2),
-            DottedRow(L.t('Máy chủ', 'Server', '서버'), Text(st.serverUrl, style: const TextStyle(fontSize: 12))),
+            DottedRow(L.t('Máy chủ', 'Server', '서버'),
+                Text(st.demo ? L.t('Bản demo — dữ liệu mẫu trong máy', 'Demo — sample data on device', '데모 — 샘플 데이터')
+                    : st.serverUrl,
+                    style: const TextStyle(fontSize: 12))),
             const SizedBox(height: 12),
             Wrap(spacing: 10, runSpacing: 8, children: [
               OutlinedButton.icon(
@@ -48,7 +51,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               OutlinedButton.icon(
                 icon: const Icon(Icons.logout, size: 17),
-                label: Text(L.t('Đăng xuất', 'Sign out', '로그아웃')),
+                label: Text(st.demo
+                    ? L.t('Thoát bản demo', 'Exit demo', '데모 종료')
+                    : L.t('Đăng xuất', 'Sign out', '로그아웃')),
                 style: OutlinedButton.styleFrom(foregroundColor: Ink2.oxblood),
                 onPressed: () => st.logout(),
               ),
