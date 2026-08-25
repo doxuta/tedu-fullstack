@@ -878,6 +878,51 @@ body.th-bday .pt{color:#A34C55}
 .tbl .num,.tfoot td,.stat .v,.kv .v-money{white-space:nowrap}
 .list-item b{white-space:nowrap}
 @media print{.sidebar,.btn,.bulkbar,#landing{display:none!important}main{padding:0}body{background:#fff}}
+
+/* ═══════════════════════════════════════════════════════════════
+   TƯƠNG THÍCH — mobile · in ấn · fallback trình duyệt
+   ═══════════════════════════════════════════════════════════════ */
+/* banner lễ trên màn nhỏ: bỏ hoạ tiết hai bên, chữ tự xuống dòng */
+@media(max-width:760px){
+  .hol-banner>div{height:auto!important;min-height:84px}
+  .hol-banner>div>svg[style*="position:absolute"]{display:none!important}
+  .hol-banner>div>div[style*="inset:0"][style*="flex-direction:column"]{
+    position:relative!important;inset:auto!important;padding:12px 16px!important}
+  .hol-banner [style*="white-space:nowrap"]{white-space:normal!important}
+  .hol-banner div[style*="font-weight:900"]{font-size:clamp(15px,5.4vw,24px)!important;letter-spacing:.03em!important}
+  .hol-banner div[style*="Dancing Script"],.hol-banner div[style*="Caveat"]{font-size:15px!important}
+  #holGarland{height:50px;margin-bottom:10px}
+  #holGarland span{width:19px;height:25px}
+  #holGarland span::before{top:-10px;height:10px}
+}
+/* thanh xem thử: chừa tai thỏ iPhone, pill gọn */
+#holBar{padding-bottom:calc(9px + env(safe-area-inset-bottom))}
+@media(max-width:640px){
+  #holBar .hb-pill{padding:6px 10px;font-size:11.5px}
+  #holBar .hb-exit{padding:5px 8px}
+  body.preview-on #app main{padding-bottom:calc(92px + env(safe-area-inset-bottom))}
+}
+/* thiệp sinh nhật trên màn nhỏ */
+@media(max-width:640px){
+  #bdayCard{padding:10px 8px}
+  #bdayCard .dq-left,#bdayCard .dq-right{padding:22px 18px 20px}
+  #bdayCard .dq-port{width:200px}
+  #bdayCard .dq-post{width:64px;height:64px;right:8px;top:8px}
+  #bdayCard .dq-deck{margin-right:0}
+}
+/* in ấn: giấu đồ trang trí, ép về giấy sáng kể cả đang chế độ tối */
+@media print{
+  #holBar,.hol-banner,#bdayOpenBar,.thm-btn,#themeDeco,#holGarland,#holFx{display:none!important}
+  body.dark{--paper:#F1EAD8;--card:#F7F2E3;--panel:#EDE4CD;--field:#FBF6E7;
+    --ink:#2B2318;--inkr:43,35,24;--mut:#7A6F5C;--mut2:#A39A85;
+    --line:rgba(43,35,24,.16);--line2:rgba(43,35,24,.3);--line3:rgba(43,35,24,.45);
+    --esp:#221B12;--cream:#EFE6CF}
+}
+/* Safari cũ chưa có aspect-ratio */
+@supports not (aspect-ratio:1/1){
+  #bdayCard .dq-oval{height:300px}
+  .qbday-photo{height:212px}
+}
 </style>
 </head>
 <body>
@@ -5248,6 +5293,47 @@ async function aiTestKey(btn){
 /* ========== ĐA NGÔN NGỮ (VI / EN / KO) ========== */
 let LANG='vi'; try{LANG=localStorage.getItem('tedu_lang')||'vi';}catch(e){}
 const I18N={
+"Thoát ✕":["Exit ✕","나가기 ✕"],
+"Chế độ tối":["Dark mode", "다크 모드"],
+"Chế độ sáng":["Light mode", "라이트 모드"],
+"Đã bật chế độ tối — giấy đêm":["Dark mode on — night paper", "다크 모드 켬 — 밤의 종이"],
+"Đã về chế độ sáng — giấy ngày":["Back to light mode — day paper", "라이트 모드로 복귀"],
+"Xem thử":["Preview", "미리보기"],
+"ngày lễ":["holidays", "명절"],
+"Ngày thật":["Real date", "실제 날짜"],
+"Thoát":["Exit", "나가기"],
+"Mở thiệp":["Open card", "카드 열기"],
+"MỞ THIỆP":["OPEN CARD", "카드 열기"],
+"PHÁT LẠI":["REPLAY", "다시 재생"],
+"CẢM ƠN":["THANK YOU", "감사합니다"],
+"BỐC LÁ KHÁC":["DRAW ANOTHER", "다른 카드 뽑기"],
+"XẾP LẠI BỘ BÀI":["RESHUFFLE", "카드 다시 섞기"],
+"Chúc mừng sinh nhật":["Happy birthday", "생일 축하합니다"],
+"Lá bài tiên tri tuổi mới":["New-year fortune card", "새해 운세 카드"],
+"Tiệm TEdu bói hoa · mỗi lá một điềm lành":["TEdu flower fortunes · every card a good omen", "TEdu 꽃점 · 모든 카드가 길조"],
+"ĐÃ GỬI LỜI CẢM ƠN VỀ TIỆM · 28.05":["THANK-YOU SENT TO THE SHOP · 28.05", "감사 인사 전달됨 · 28.05"],
+"sinh nhật của bạn":["your birthday", "당신의 생일"],
+"Tết 🧧":["Lunar New Year 🧧", "설날 🧧"],
+"Trung thu 🏮":["Mid-Autumn 🏮", "추석 🏮"],
+"Giỗ Tổ ⚜️":["Hùng Kings' Day ⚜️", "훙왕 기일 ⚜️"],
+"Tết dương 🎆":["New Year 🎆", "새해 🎆"],
+"8/3 🌷":["Women's Day 8/3 🌷", "여성의 날 8/3 🌷"],
+"30/4–1/5 🕊️":["Apr 30 – May 1 🕊️", "4/30–5/1 🕊️"],
+"1/6 🎈":["Children's Day 1/6 🎈", "어린이날 1/6 🎈"],
+"2/9 🇻🇳":["National Day 2/9 🇻🇳", "국경일 2/9 🇻🇳"],
+"20/10 🌹":["VN Women's Day 20/10 🌹", "베트남 여성의 날 🌹"],
+"20/11 💐":["Teachers' Day 20/11 💐", "스승의 날 20/11 💐"],
+"Noel 🎄":["Christmas 🎄", "크리스마스 🎄"],
+"Khai giảng 🎒":["Back to school 🎒", "개학 🎒"],
+"Đoan Ngọ 🍒":["Đoan Ngọ 🍒", "단오 🍒"],
+"Phật Đản 🪷":["Vesak 🪷", "석가탄신일 🪷"],
+"Vu Lan 💗":["Vu Lan 💗", "우란분절 💗"],
+"Hàn thực 🍡":["Hàn thực 🍡", "한식 🍡"],
+"Valentine 💝":["Valentine 💝", "발렌타인 💝"],
+"Halloween 🎃":["Halloween 🎃", "할로윈 🎃"],
+"Gia đình VN 🏡":["VN Family Day 🏡", "베트남 가족의 날 🏡"],
+"Sinh nhật 🎂":["Birthday 🎂", "생일 🎂"],
+
 "Tick buổi trên lưới → lập phiếu & in → phụ huynh trả tiền → đánh dấu đã thu":["Tick sessions on the grid → invoice & print → parent pays → mark collected","격자에서 수업 선택 → 청구서 인쇄 → 학부모 결제 → 수금 표시"],
 "Chưa lập phiếu":["Not invoiced","미청구"],
 "Phiếu chờ thu tiền":["Invoices awaiting payment","수금 대기 청구서"],
