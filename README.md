@@ -48,10 +48,6 @@ Tết, Trung thu, Giỗ Tổ... cho **mọi năm về sau**; banner ghi đúng n
 (Đinh Mùi 2027 → Mậu Thân 2028 → ...); mỗi dịp re-skin toàn app với hoạ tiết vẽ tay SVG,
 dàn treo, hạt rơi — không dùng emoji.
 
-**🎂 Sinh nhật cá nhân hoá** — đúng ngày 28/05, tài khoản Diễm Quỳnh nhận nguyên một
-theme riêng: chân dung khung oval bưu hoa, thiệp toàn màn hình, confetti,
-và **trò bói hoa** — bốc 1 trong 9 lá bài điềm lành, tuổi tự cộng đúng mỗi năm.
-
 **☁️ Tài khoản & vận hành** — đăng nhập Google, mỗi giáo viên một sổ riêng tự đồng bộ,
 chế độ demo đầy dữ liệu mẫu, trang quản trị (khoá tài khoản, bảo trì, thông báo),
 chat giáo viên ↔ admin có báo email. Ba ngôn ngữ VI / EN / 한국어. Chế độ tối "giấy đêm"
@@ -69,9 +65,6 @@ chat giáo viên ↔ admin có báo email. Ba ngôn ngữ VI / EN / 한국어. C
 
 ### Theme Noel — giấy ngà, dải thông, tuyết rơi
 ![Theme Noel](docs/screenshots/theme-noel.png)
-
-### Sinh nhật Diễm Quỳnh 28·05 — cờ dây, gerbera, thiệp + bói hoa
-![Sinh nhật Diễm Quỳnh](docs/screenshots/birthday-quynh.png)
 
 > Xem trực tiếp cả 20 dịp: **https://doxuta.github.io/tedu/?preview** — thanh chuyển lễ ở cạnh dưới.
 > Giao diện Flutter (app/) đồng bộ cùng ngôn ngữ thiết kế vintage với web.
