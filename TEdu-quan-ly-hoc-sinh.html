@@ -1582,7 +1582,8 @@ function fixup(d){
   return d;
 }
 let DB=fixup(null);
-function save(){ try{localStorage.setItem(LS_KEY,JSON.stringify(DB));}catch(e){toast('Không lưu được dữ liệu: '+e.message);} scheduleCloudSave(); }
+function save(){ if(FB.broken)return; /* không đọc được sổ trên mây -> cấm mọi lần ghi, kẻo dữ liệu mẫu đè lên sổ thật */
+  try{localStorage.setItem(LS_KEY,JSON.stringify(DB));}catch(e){toast('Không lưu được dữ liệu: '+e.message);} scheduleCloudSave(); }
 function loadDB(){ try{const raw=localStorage.getItem(LS_KEY); if(raw){DB=fixup(JSON.parse(raw)); return true;}}catch(e){} return false; }
 
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
@@ -4193,6 +4194,13 @@ function showGate(kind,extra){
       +'<div class="gate-title">Tài khoản bị tạm khoá</div>'
       +'<div class="gate-sub">Tài khoản <b>'+H(FB.user?FB.user.email:'')+'</b> đã bị quản trị viên tạm khoá.<br>Vui lòng liên hệ quản trị viên để mở lại.</div>'
       +'<button class="btn btn-ghost" onclick="cloudSignOut()">Đăng xuất</button>';
+  }else if(kind==='broken'){
+    inner='<div class="gate-logo" style="border-color:rgba(147,57,44,.6)">!</div>'
+      +'<div class="gate-title">Không đọc được dữ liệu đám mây</div>'
+      +'<div class="gate-sub">TEdu đã <b>dừng lại và không ghi đè</b> lên sổ của bạn. Hãy tải bản sao thô về máy rồi liên hệ hỗ trợ để khôi phục — đừng dùng tiếp trên máy này.'
+      +(extra?'<br><span class="muted" style="font-size:11px">Lỗi: '+H(extra)+'</span>':'')+'</div>'
+      +'<button class="btn btn-pri" style="width:100%" data-tip="Tải nguyên văn dữ liệu trên mây về máy" onclick="cloudRescueDownload()">'+ic('download')+' Tải bản sao thô về máy</button>'
+      +'<div class="mt"><button class="btn btn-ghost" onclick="cloudSignOut()">Đăng xuất</button></div>';
   }else if(kind==='maintenance'){
     inner='<div class="gate-logo">⚙</div>'
       +'<div class="gate-title">Hệ thống đang bảo trì</div>'
@@ -4360,7 +4368,11 @@ function bootstrapCloud(){
     return dataRef().get().then(function(ds){
       if(ds.exists&&ds.data().j){
         FB.rev=(+ds.data().rev)||0;   // mốc phiên bản phiên này đọc được — đẩy lên sau đó phải xuất phát từ đây
-        try{DB=fixup(JSON.parse(ds.data().j));save();}catch(e){}
+        /* Đọc hỏng thì DỪNG HẲN: nuốt lỗi ở đây đồng nghĩa để dữ liệu mẫu ghi đè cả sổ thật của giáo viên */
+        let inc=null;
+        try{inc=fixup(JSON.parse(ds.data().j));}
+        catch(e){cloudRescue(ds.data().j,e);return Promise.reject({handled:true});}
+        DB=inc;save();
       }else{
         // lần đầu: ưu tiên dữ liệu máy (per-uid), rồi tới dữ liệu cũ trước-cloud
         if(!loadDB()&&legacy){
@@ -4386,6 +4398,18 @@ function bootstrapCloud(){
     if(e&&e.handled)return;
     showGate('login','Không tải được dữ liệu: '+(e&&e.message||e));
   });
+}
+/* Không đọc nổi sổ trên mây: dừng hẳn, không cho ghi bất cứ thứ gì đè lên, giữ nguyên bản thô để cứu dữ liệu */
+let cloudRaw='';
+function cloudRescue(raw,e){
+  FB.broken=true;FB.cloud=false;cloudRaw=String(raw==null?'':raw);
+  try{localStorage.setItem('tedu_cloud_rescue_'+(FB.user?FB.user.uid:'x'),cloudRaw);}catch(_){}
+  showGate('broken',(e&&e.message)||'');
+}
+function cloudRescueDownload(){
+  if(!cloudRaw){toast('Không còn bản thô trong phiên này — đăng nhập lại rồi thử lại');return;}
+  download('tedu-cuu-du-lieu-'+todayStr()+'.json',cloudRaw,'application/json');
+  toast('Đã tải bản sao thô — gửi file này cho hỗ trợ để khôi phục');
 }
 /* Đẩy lên mây có KIỂM TRA PHIÊN BẢN: mỗi lần ghi tăng rev 1 đơn vị. Nếu trên mây rev đã cao hơn
    con số phiên này đọc được (máy khác vừa ghi), giao dịch bị từ chối chứ không ghi đè. */
