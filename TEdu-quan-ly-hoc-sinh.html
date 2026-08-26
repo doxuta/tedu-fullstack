@@ -1550,15 +1550,24 @@ function fixup(d){
     d.payments.slice().sort((a,b)=>(a.paidAt||'').localeCompare(b.paidAt||'')).forEach(p=>{
       if(p.sessionKeys.length||!p.month)return;
       const stu=(d.students||[]).find(s=>s.id===p.studentId);
-      const rate=stu?(+stu.rate||0):0;
+      /* Đơn giá LÚC THU, không phải đơn giá hôm nay: nếu phiếu cũ có lưu rate thì dùng, để tăng giá về sau
+         không làm hụt số buổi được ghi nhận (buổi hụt sẽ hiện lại thành "chưa lập phiếu" và bị thu hai lần). */
+      const rate=+p.rate>0?+p.rate:(stu?(+stu.rate||0):0);
       const cl=(claimed[p.studentId]=claimed[p.studentId]||new Set());
       const pool=(billOf[p.studentId]||[]).filter(x=>x.date.slice(0,7)===p.month&&!cl.has(x.key));
       let n=rate>0?Math.round((+p.amount||0)/rate):pool.length;
-      if(n<=0)n=pool.length;
+      if(n<=0||n>pool.length)n=pool.length;
       p.sessionKeys=pool.slice(0,n).map(x=>{cl.add(x.key);return x.key;});
     });
     d.meta.payMigrated=true;
   }
+  /* Phiếu cũ chưa lưu đơn giá: suy ra từ số tiền / số buổi của chính phiếu đó, để mọi con số lịch sử
+     (nhắc phí, "còn nợ", báo cáo thu nhập) không đổi theo khi giáo viên tăng đơn giá. */
+  d.payments.forEach(p=>{
+    if(p.rate!==undefined&&p.rate!=='')return;
+    const n=+p.sessions||p.sessionKeys.length;
+    if(n>0&&+p.amount>0)p.rate=(+p.amount)/n;
+  });
   d.lessons.forEach(function(l){if(!Array.isArray(l.docIds))l.docIds=[];});
   d.makeups=Array.isArray(d.makeups)?d.makeups:[];
   (function(){
@@ -1725,6 +1734,10 @@ function sessionStatesOf(sid){
 function uninvoicedOf(sid){return sessionStatesOf(sid).filter(x=>x.state==='none');}
 /* Nợ thực tế = mọi buổi CHƯA THU TIỀN (chưa lập phiếu + phiếu chờ thu) */
 function outstandingOf(sid){return sessionStatesOf(sid).filter(x=>x.state!=='collected');}
+/* Đơn giá MỘT buổi: buổi đã lên phiếu giữ nguyên giá lúc lập phiếu (phiếu đã in không được đổi giá),
+   buổi chưa lập phiếu mới theo đơn giá hiện tại của học sinh. */
+function sessRateOf(x,s){const pm=x&&x.invoice;return (pm&&pm.rate!==undefined&&pm.rate!=='')?(+pm.rate||0):(+((s||{}).rate)||0);}
+function sessMoneyOf(list,s){return list.reduce((t,x)=>t+sessRateOf(x,s),0);}
 function paidRecently(days){
   const cut=addDaysISO(-days);
   return DB.payments.filter(p=>p.paid&&(p.collectedAt||'')>=cut).reduce((t,p)=>t+(+p.amount||0),0);
@@ -1868,7 +1881,7 @@ function renderDash(){
   const openCls=DB.classes.filter(c=>classStatusInfo(c).k==='open').length;
   const taught=DB.attendance.filter(a=>a.date.startsWith(m)).length;
   const owedList=DB.students.map(s=>({s,list:outstandingOf(s.id)}))
-    .map(x=>({...x,remain:x.list.length*(+x.s.rate||0),uninv:x.list.filter(q=>q.state==='none').length,await:x.list.filter(q=>q.state==='invoiced').length}))
+    .map(x=>({...x,remain:sessMoneyOf(x.list,x.s),uninv:x.list.filter(q=>q.state==='none').length,await:x.list.filter(q=>q.state==='invoiced').length}))
     .filter(x=>x.list.length>0).sort((a,b)=>b.remain-a.remain);
   const uninvSess=owedList.reduce((t,x)=>t+x.uninv,0);
   const awaitM=awaitingTotal();
@@ -2227,7 +2240,7 @@ function openProfile(id){
   const m=curMonth();
   const cls=classesOfStudent(id);
   const atts=attOfStudentMonth(id,m);
-  const outL=outstandingOf(id), owed=outL.length*(+s.rate||0);
+  const outL=outstandingOf(id), owed=sessMoneyOf(outL,s);
   const uninvN=outL.filter(x=>x.state==='none').length, awaitN=outL.filter(x=>x.state==='invoiced').length;
   const lastPay=DB.payments.filter(p=>p.studentId===id).sort((a,b)=>(b.paidAt||'').localeCompare(a.paidAt||''))[0];
   const scores=DB.scores.filter(x=>x.studentId===id).sort((a,b)=>b.date.localeCompare(a.date));
@@ -2524,7 +2537,7 @@ function classRecapData(c){
   const students=Object.keys(per).map(id=>{
     const s=studentById(id),n=per[id],money=n*(+s.rate||0);
     const un=outstandingOf(id);
-    return {s,n,money,unpaid:un.length,unpaidMoney:un.length*(+s.rate||0)};
+    return {s,n,money,unpaid:un.length,unpaidMoney:sessMoneyOf(un,s)};
   }).sort((a,b)=>a.s.name.localeCompare(b.s.name,'vi'));
   return {sessions:recs.length,months:[...months].sort(),revenue:students.reduce((t,x)=>t+x.money,0),students};
 }
@@ -2730,7 +2743,7 @@ function feeRowsAll(){
       awaiting:states.filter(x=>x.state==='invoiced'),
       outstanding:states.filter(x=>x.state!=='collected')};
   }).filter(x=>x.states.length>0)
-    .sort((a,b)=>b.outstanding.length*(+b.s.rate||0)-a.outstanding.length*(+a.s.rate||0));
+    .sort((a,b)=>sessMoneyOf(b.outstanding,b.s)-sessMoneyOf(a.outstanding,a.s));
 }
 function renderFees(){
   const rows=feeRowsAll();
@@ -2759,7 +2772,7 @@ function renderFees(){
     let sel=feeSel[r.s.id]||new Set();
     /* Bỏ tick những buổi đã hết tính phí (sửa điểm danh) hoặc đã lên phiếu — nếu không, con số hiện ra sẽ lệch với phiếu */
     if(sel.size){const ok=new Set(r.uninv.map(x=>x.key));const pr=new Set([...sel].filter(k=>ok.has(k)));if(pr.size!==sel.size)sel=feeSel[r.s.id]=pr;}
-    const owedM=r.outstanding.length*(+r.s.rate||0);
+    const owedM=sessMoneyOf(r.outstanding,r.s);
     html+='<div class="card mt" style="padding:14px 16px">';
     html+='<div class="spread" style="cursor:pointer" onclick="feeToggle(\''+r.s.id+'\')">'
       +'<div class="stu-cell">'+avatar(r.s,'av-sm')+'<div><div class="nm">'+H(r.s.name)+'</div>'
@@ -2805,7 +2818,7 @@ let feeRepOpen=false;
 function feeRepToggle(){feeRepOpen=!feeRepOpen;renderFees();}
 function feeReportData(){
   const rev={},inv={},col={};
-  DB.students.forEach(s=>{const rate=+s.rate||0;billableSessionsOf(s.id).forEach(x=>{const m=x.date.slice(0,7);rev[m]=(rev[m]||0)+rate;});});
+  DB.students.forEach(s=>{const im=invoiceMapOf(s.id);billableSessionsOf(s.id).forEach(x=>{const m=x.date.slice(0,7);rev[m]=(rev[m]||0)+sessRateOf({invoice:im.get(x.key)},s);});});
   DB.payments.forEach(pm=>{
     const mi=(pm.paidAt||'').slice(0,7); if(mi)inv[mi]=(inv[mi]||0)+(+pm.amount||0);
     if(pm.paid){const mc=(pm.collectedAt||pm.paidAt||'').slice(0,7); if(mc)col[mc]=(col[mc]||0)+(+pm.amount||0);}
@@ -2959,11 +2972,11 @@ function cancelPayment(pid,sid){
 /* ========== TIN NHẮN MẪU / LIÊN LẠC ========== */
 function msgFee(s){
   const list=outstandingOf(s.id);
-  const n=list.length, amount=n*(+s.rate||0);
+  const n=list.length, amount=sessMoneyOf(list,s), rs=[...new Set(list.map(x=>sessRateOf(x,s)))];
   let t='Kính chào anh/chị – phụ huynh em '+s.name+'.\n';
   if(n>0){
     t+='Em đã học '+n+' buổi chưa thanh toán học phí ('+rangeLabel(list)+')'+(s.subject?' môn '+s.subject:'')+'.\n'
-      +'Học phí: '+n+' buổi × '+fmtM(s.rate)+' = '+fmtM(amount)+'.';
+      +'Học phí: '+(rs.length===1?n+' buổi × '+fmtM(rs[0])+' = ':'tổng cộng ')+fmtM(amount)+'.';
   }else{
     t+='Hiện em không còn buổi học nào chưa thanh toán. Cảm ơn anh/chị!';
   }
@@ -2996,7 +3009,7 @@ function msgProgress(s,days){
     const r=(rec.records||[]).find(x=>x.studentId===s.id); if(r)atts.push({date:rec.date,status:r.status});});
   const cnt={present:0,late:0,excused:0,absent:0}; atts.forEach(a=>cnt[a.status]!==undefined&&cnt[a.status]++);
   const scores=DB.scores.filter(x=>x.studentId===s.id&&x.date>=cut).sort((a,b)=>a.date.localeCompare(b.date));
-  const outL=outstandingOf(s.id), owed=outL.length*(+s.rate||0);
+  const outL=outstandingOf(s.id), owed=sessMoneyOf(outL,s);
   let t='Kính gửi anh/chị – phụ huynh em '+s.name+'.\n';
   t+='Trong '+days+' ngày qua em học '+atts.length+' buổi: '+(cnt.present+cnt.late)+' có mặt'+(cnt.late?' ('+cnt.late+' buổi muộn)':'')+(cnt.excused?', '+cnt.excused+' vắng có phép':'')+(cnt.absent?', '+cnt.absent+' vắng không phép':'')+'.\n';
   if(scores.length){
@@ -5121,7 +5134,7 @@ function aiLocalParse(text,sub){
     if(m[1]==='truoc'){const d0=new Date();d0.setMonth(d0.getMonth()-1);mo=d0.getFullYear()+'-'+pad(d0.getMonth()+1);}
     else if(m[1]&&m[1]!=='nay')mo=curMonth().slice(0,5)+pad(+m[1]);
     const rd=feeReportData();
-    const owedAll=DB.students.reduce(function(t,s){return t+outstandingOf(s.id).length*(+s.rate||0);},0);
+    const owedAll=DB.students.reduce(function(t,s){return t+sessMoneyOf(outstandingOf(s.id),s);},0);
     return{html:'<b>Báo cáo '+monthLabel(mo)+'</b>'
       +aiRow('Phát sinh (dạy)',fmtM(rd.rev[mo]||0))
       +aiRow('Đã lập phiếu',fmtM(rd.inv[mo]||0))
@@ -5199,7 +5212,7 @@ function aiQUnpaid(){
   const rows=[];let total=0,sessTotal=0;
   DB.students.forEach(function(s){
     const un=outstandingOf(s.id);
-    if(un.length){const amt=un.length*(+s.rate||0);total+=amt;sessTotal+=un.length;
+    if(un.length){const amt=sessMoneyOf(un,s);total+=amt;sessTotal+=un.length;
       const ui=un.filter(x=>x.state==='none').length,aw=un.length-ui;
       rows.push(aiRow(s.name+' · '+(ui?ui+' chưa lập phiếu':'')+(ui&&aw?' + ':'')+(aw?aw+' chờ thu':''),'<b class="ai-red">'+fmtM(amt)+'</b> <button class="btn btn-xs btn-ghost" onclick="feeOpen.add(\''+s.id+'\');nav(\'fees\')">Mở lưới</button>'));}
   });
@@ -5208,7 +5221,7 @@ function aiQUnpaid(){
 }
 function aiQMoney(){
   let owed=0,sess=0,uninv=0;
-  DB.students.forEach(function(s){const un=outstandingOf(s.id);sess+=un.length;owed+=un.length*(+s.rate||0);uninv+=un.filter(x=>x.state==='none').length;});
+  DB.students.forEach(function(s){const un=outstandingOf(s.id);sess+=un.length;owed+=sessMoneyOf(un,s);uninv+=un.filter(x=>x.state==='none').length;});
   return{html:aiRow('Buổi chưa lập phiếu',String(uninv))+aiRow('Phiếu chờ thu','<b style="color:#C8922A">'+fmtM(awaitingTotal())+'</b>')+aiRow('Tổng chưa thu','<b class="ai-red">'+fmtM(owed)+'</b>')+aiRow('Đã thu 30 ngày','<b class="ai-grn">'+fmtM(paidRecently(30))+'</b>'),actions:[]};
 }
 function aiQCount(){
@@ -5218,7 +5231,7 @@ function aiQCount(){
 }
 function aiQStudent(s){
   const month=curMonth();
-  const un=outstandingOf(s.id),owed=un.length*(+s.rate||0);
+  const un=outstandingOf(s.id),owed=sessMoneyOf(un,s);
   const cls=classesOfStudent(s.id).map(function(c){return c.name;}).join(', ')||'—';
   const sc=DB.scores.filter(function(x){return x.studentId===s.id;}).sort(function(a,b){return b.date.localeCompare(a.date);}).slice(0,3);
   return{html:'<b>'+H(s.name)+'</b> · '+H(s.grade||'')+' <span class="bd '+(s.status==='active'?'bd-grn':s.status==='paused'?'bd-amb':'bd-gray')+'">'+aiStatusVN(s.status)+'</span>'
@@ -5236,7 +5249,7 @@ function aiCtx(){
     settings:{defaultRate:DB.settings.defaultRate,chargeUnexcused:DB.settings.chargeUnexcused},
     students:DB.students.map(function(s){return{id:s.id,name:s.name,grade:s.grade,subject:s.subject,rate:s.rate,status:s.status,parent:s.parentName};}),
     classes:DB.classes.map(function(c){return{id:c.id,name:c.name,days:c.days,start:c.start,end:c.end,from:c.startDate,to:c.endDate,students:(c.studentIds||[]).map(function(id){var s=studentById(id);return s?s.name:null;}).filter(Boolean)};}),
-    money:DB.students.map(function(s){var un=outstandingOf(s.id);var ui=un.filter(function(x){return x.state==='none';}).length;return{id:s.id,name:s.name,uninvoiced:ui,awaiting:un.length-ui,owedAmount:un.length*(+s.rate||0)};}),
+    money:DB.students.map(function(s){var un=outstandingOf(s.id);var ui=un.filter(function(x){return x.state==='none';}).length;return{id:s.id,name:s.name,uninvoiced:ui,awaiting:un.length-ui,owedAmount:sessMoneyOf(un,s)};}),
     makeupsPending:(DB.makeups||[]).filter(function(x){return x.status==='pending'&&studentById(x.sid);}).map(function(x){return{student:studentById(x.sid).name,absentOn:x.date};}),
     awaitingInvoices:DB.payments.filter(function(pm){return !pm.paid&&studentById(pm.studentId);}).map(function(pm){return{student:studentById(pm.studentId).name,amount:pm.amount,madeOn:pm.paidAt};}),
     incomeReport:(function(){var r=feeReportData();return r.months.slice(0,3).map(function(mo){return{month:mo,earned:r.rev[mo]||0,invoiced:r.inv[mo]||0,collected:r.col[mo]||0};});})(),
