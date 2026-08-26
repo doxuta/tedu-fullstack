@@ -4140,7 +4140,7 @@ function uploadQR(ev){
 }
 function removeQR(){DB.settings.qrImage='';save();toast('Đã gỡ ảnh QR');renderSettings();}
 /* ========== ĐÁM MÂY: FIREBASE AUTH + FIRESTORE ========== */
-const FB={auth:null,db:null,user:null,profile:null,isAdmin:false,cloud:false,cfg:null,ann:'',sharedKey:''};
+const FB={auth:null,db:null,user:null,profile:null,isAdmin:false,cloud:false,cfg:null,ann:'',sharedKey:'',rev:0,broken:false};
 let DEMO=false,loginIntent='user';
 let cloudTimer=null;
 function cloudEnabled(){return !!(window.TEDU_FIREBASE_CONFIG&&window.firebase&&window.firebase.initializeApp);}
@@ -4237,7 +4237,7 @@ function exitDemo(){
 }
 function cloudSignOut(){
   if(FB.auth)FB.auth.signOut();
-  FB.user=null;FB.profile=null;FB.isAdmin=false;FB.cloud=false;FB.ann='';FB.sharedKey='';
+  FB.user=null;FB.profile=null;FB.isAdmin=false;FB.cloud=false;FB.ann='';FB.sharedKey='';FB.rev=0;FB.broken=false;cloudStaleShown=false;
   const na=document.getElementById('navAdmin'),ng=document.getElementById('ngAdmin');
   if(na)na.style.display='none'; if(ng)ng.style.display='none';
   setLSKey(null);loadDB();
@@ -4359,6 +4359,7 @@ function bootstrapCloud(){
     setLSKey(u.uid);
     return dataRef().get().then(function(ds){
       if(ds.exists&&ds.data().j){
+        FB.rev=(+ds.data().rev)||0;   // mốc phiên bản phiên này đọc được — đẩy lên sau đó phải xuất phát từ đây
         try{DB=fixup(JSON.parse(ds.data().j));save();}catch(e){}
       }else{
         // lần đầu: ưu tiên dữ liệu máy (per-uid), rồi tới dữ liệu cũ trước-cloud
@@ -4386,20 +4387,42 @@ function bootstrapCloud(){
     showGate('login','Không tải được dữ liệu: '+(e&&e.message||e));
   });
 }
+/* Đẩy lên mây có KIỂM TRA PHIÊN BẢN: mỗi lần ghi tăng rev 1 đơn vị. Nếu trên mây rev đã cao hơn
+   con số phiên này đọc được (máy khác vừa ghi), giao dịch bị từ chối chứ không ghi đè. */
 function cloudPush(){
-  if(!FB.user||!FB.db)return Promise.resolve();
-  const j=JSON.stringify(DB);
-  return dataRef().set({j:j,updatedAt:new Date().toISOString()}).then(function(){
+  if(!FB.user||!FB.db||FB.broken)return Promise.resolve();
+  const ref=dataRef();
+  let next=0;
+  return FB.db.runTransaction(function(tx){
+    return tx.get(ref).then(function(ds){
+      const remote=(ds.exists?+ds.data().rev:0)||0;
+      if(remote>FB.rev)return Promise.reject({stale:true,remote:remote});
+      next=remote+1; DB.meta.rev=next;
+      tx.set(ref,{j:JSON.stringify(DB),rev:next,updatedAt:new Date().toISOString()});
+    });
+  }).then(function(){
+    FB.rev=next;
     userRef().update({counts:{students:DB.students.length,classes:DB.classes.length,attendance:DB.attendance.length},lastActive:new Date().toISOString()}).catch(function(){});
   });
 }
+let cloudStaleShown=false;
+function cloudStaleWarn(){
+  if(cloudStaleShown)return; cloudStaleShown=true;   // báo một lần, huy hiệu đồng bộ vẫn đỏ tới khi tải lại
+  toast('Thiết bị khác đã sửa sổ — TEdu không ghi đè lên bản mới hơn');
+  setTimeout(function(){
+    if(confirm('Sổ trên đám mây đã được thiết bị khác cập nhật MỚI HƠN bản đang mở ở máy này.\n\nĐể không xoá mất dữ liệu của thiết bị kia, TEdu đã KHÔNG lưu thay đổi vừa rồi lên mây.\n\nOK = tải lại bản mới nhất từ đám mây (thay đổi vừa gõ ở máy này sẽ mất).\nHuỷ = giữ nguyên màn hình — bấm "Sao lưu dữ liệu" để xuất file trước khi tải lại.'))location.reload();
+  },400);
+}
 function scheduleCloudSave(){
-  if(!FB.cloud)return;
+  if(!FB.cloud||FB.broken)return;
   setSync('saving','Đang lưu...');
   clearTimeout(cloudTimer);
   cloudTimer=setTimeout(function(){
     cloudPush().then(function(){setSync('saved','Đã đồng bộ');})
-      .catch(function(){setSync('error','Lỗi đồng bộ');toast('Không đồng bộ được — kiểm tra mạng');});
+      .catch(function(e){
+        if(e&&e.stale){setSync('error','Máy khác mới hơn — chưa lưu');cloudStaleWarn();return;}
+        setSync('error','Lỗi đồng bộ');toast('Không đồng bộ được — kiểm tra mạng');
+      });
   },1500);
 }
 /* ========== TRANG QUẢN TRỊ ========== */
