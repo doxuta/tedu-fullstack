@@ -1528,6 +1528,7 @@ function fixup(d){
   d.students=d.students||[]; d.classes=d.classes||[]; d.attendance=d.attendance||[];
   d.classes.forEach(function(c){if(c.startDate===undefined)c.startDate='';if(c.endDate===undefined)c.endDate='';});
   d.payments=d.payments||[]; d.scores=d.scores||[]; d.lessons=d.lessons||[]; d.meta=d.meta||{}; d.slipNotes=d.slipNotes||{}; d.docs=d.docs||[];
+  d.voids=Array.isArray(d.voids)?d.voids:[];   // phiếu đã huỷ — giữ lại làm dấu vết, không tính vào tiền nong
   d.payments.forEach(p=>{
     if(!Array.isArray(p.sessionKeys))p.sessionKeys=[];
     if(p.paid===undefined)p.paid=true;               // phiếu thời cũ: coi như đã thu
@@ -2834,7 +2835,13 @@ function exportPayCSV(){
     const days=(pm.sessionKeys||[]).map(k=>fmtDShort(k.split('|')[0])).join(' ');
     return [paySerial(pm),s?s.name:'?',pm.sessions||(pm.sessionKeys||[]).length,days,Math.round(+pm.amount||0),pm.paid?'Đã thu':'Chờ thu',pm.paidAt||'',pm.collectedAt||'',pm.method||'',pm.note||''];
   });
-  const csv='\uFEFF'+[head,...rows].map(r=>r.map(csvCell).join(';')).join('\r\n');
+  /* Phiếu đã huỷ vẫn nằm trong sổ, cột Số tiền để 0 để cộng cột không sai, số tiền gốc ghi ở cột Ghi chú */
+  const vrows=(DB.voids||[]).slice().sort((a,b)=>(a.paidAt||'').localeCompare(b.paidAt||'')).map(v=>{
+    const sv=studentById(v.studentId);
+    return [v.serial||'—',sv?sv.name:'?',v.sessions||(v.sessionKeys||[]).length,(v.sessionKeys||[]).map(k=>fmtDShort(k.split('|')[0])).join(' '),0,'ĐÃ HUỶ',v.paidAt||'',v.collectedAt||'',v.method||'',
+      'Huỷ ngày '+fmtD(v.voidedAt||'')+' · số tiền gốc '+Math.round(+v.amount||0)+(v.wasPaid?' (đã thu)':' (chờ thu)')+(v.note?' · '+v.note:'')];
+  });
+  const csv='\uFEFF'+[head,...rows,...vrows].map(r=>r.map(csvCell).join(';')).join('\r\n');
   download('tedu-phieu-thu-'+todayStr()+'.csv',csv,'text/csv;charset=utf-8');
   toast('Đã tải sổ phiếu thu CSV');
 }
@@ -2929,15 +2936,24 @@ function openPayHistory(sid){
     });
     html+='</tbody></table></div><div class="hint mt">Đã thu tổng: <b>'+fmtM(list.filter(p=>p.paid).reduce((t,p)=>t+(+p.amount||0),0))+'</b> · Chờ thu: <b>'+fmtM(list.filter(p=>!p.paid).reduce((t,p)=>t+(+p.amount||0),0))+'</b>. Huỷ phiếu sẽ trả các buổi về "chưa lập phiếu".</div>';
   }
+  const vd=(DB.voids||[]).filter(v=>v.studentId===sid).sort((a,b)=>(b.voidedAt||'').localeCompare(a.voidedAt||''));
+  if(vd.length)html+='<div class="hint mt"><b>Phiếu đã huỷ</b> (giữ lại để đối chiếu sổ, không tính vào tiền nong): '
+    +vd.map(v=>H(v.serial||'—')+' · '+fmtM(v.amount)+' · '+(v.wasPaid?'đã thu':'chờ thu')+' · huỷ ngày '+fmtD(v.voidedAt)).join(' — ')+'</div>';
   html+='<div class="m-foot"><button class="btn btn-pri" onclick="closeModal()">Đóng</button></div>';
   openModal(html,true);
 }
 function cancelPayment(pid,sid){
   const p=DB.payments.find(x=>x.id===pid);
   if(!p)return;
-  if(!confirm('Huỷ phiếu này? '+(p.sessions||(p.sessionKeys||[]).length)+' buổi sẽ trở lại "chưa lập phiếu".'))return;
+  const n=(p.sessions||(p.sessionKeys||[]).length);
+  if(p.paid){
+    if(!confirm('PHIẾU NÀY ĐÃ THU '+fmtM(p.amount)+' ngày '+fmtD(p.collectedAt||p.paidAt)+'.\n\nHuỷ phiếu sẽ TRỪ số tiền đó khỏi "Đã thu 30 ngày", khỏi Báo cáo thu nhập và khỏi sổ CSV; '+n+' buổi trở lại "chưa lập phiếu" nên có thể bị tính tiền lần hai.\n\nChỉ muốn sửa lại phiếu? Bấm Huỷ, rồi bấm ↺ (hoàn tác thu tiền) trước đã.\n\nVẫn huỷ phiếu ĐÃ THU này?'))return;
+    if(!confirm('Xác nhận lần cuối — huỷ phiếu '+paySerial(p)+': '+fmtM(p.amount)+' đã thu.'))return;
+  }else if(!confirm('Huỷ phiếu này? '+n+' buổi sẽ trở lại "chưa lập phiếu".'))return;
+  /* Không xoá trắng lịch sử: cất phiếu sang DB.voids để tiền đã thu còn dấu vết đối chiếu */
+  DB.voids=(DB.voids||[]).concat([Object.assign({},p,{serial:paySerial(p),wasPaid:!!p.paid,voidedAt:todayStr()})]);
   DB.payments=DB.payments.filter(x=>x.id!==pid);
-  save();toast('Đã huỷ phiếu');openPayHistory(sid);rerender();
+  save();toast(p.paid?'Đã huỷ phiếu ĐÃ THU — lưu vào mục "Phiếu đã huỷ"':'Đã huỷ phiếu');openPayHistory(sid);rerender();
 }
 
 /* ========== TIN NHẮN MẪU / LIÊN LẠC ========== */
