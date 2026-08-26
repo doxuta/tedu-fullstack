@@ -3528,16 +3528,17 @@ function slipCardHTMLPay(pm){const o=slipPayloadOf(pm);return o?slipCardHTMLData
 /* Vẽ phiếu thuần từ dữ liệu — dùng trong app lẫn trang phiếu phụ huynh (#pslip) */
 function slipCardHTMLData(o,opt){
   opt=opt||{};
-  const C=o.c||'#93392C';
-  const sess=(o.days||[]).map(d=>({date:d}));
+  /* Dữ liệu ở đây có thể tới từ URL #pslip do người ngoài soạn — mọi giá trị phải escape/ép kiểu trước khi ghép HTML */
+  const C=/^#[0-9a-fA-F]{3,8}$/.test(String(o.c||''))?String(o.c):'#93392C';
+  const sess=(Array.isArray(o.days)?o.days:[]).map(d=>({date:String(d==null?'':d)}));
   const n=+o.n||sess.length;
   const amount=+o.amt||0;
-  const no=o.ser||'BL-00-00';
-  const st={name:o.tn,bankId:o.bid,bankAcc:o.bacc,bankHolder:o.bh,bankInfo:o.binfo,qrImage:opt.qrImage||''};
+  const no=String(o.ser||'BL-00-00');
+  const st={name:String(o.tn||''),bankId:String(o.bid||''),bankAcc:String(o.bacc||''),bankHolder:String(o.bh||''),bankInfo:String(o.binfo||''),qrImage:String(opt.qrImage||'')};
   const s={name:o.sn,grade:o.gr};
-  const p={id:o.id||'plink',paidAt:o.d,paid:!!o.paid,collectedAt:o.cd,rate:o.rate,note:o.note};
-  const cls=o.sub?[{name:o.sub,color:C}]:[];
-  const qr=qrURLFrom(o.bid,o.bacc,o.bh,amount,'HP '+o.sn);
+  const p={id:String(o.id||'plink').replace(/[^A-Za-z0-9_-]/g,'')||'plink',paidAt:String(o.d||''),paid:!!o.paid,collectedAt:String(o.cd||''),rate:o.rate,note:String(o.note||'')};
+  const cls=o.sub?[{name:String(o.sub),color:C}]:[];
+  const qr=qrURLFrom(st.bankId,st.bankAcc,st.bankHolder,amount,'HP '+String(o.sn||''));
   const dstamp=fmtD(p.paidAt||todayStr()).replace(/\//g,'.');
   const words=moneyToWordsVN(amount);
   const note=(p.note||'').trim();
@@ -3547,18 +3548,18 @@ function slipCardHTMLData(o,opt){
   h+='<div class="slip-frame">'+slipCorner('tl')+slipCorner('tr')+slipCorner('br')+slipCorner('bl')+'</div>';
   h+='<div class="slip-in">';
   h+='<div class="slip-head">'
-    +'<span class="slip-serial">SỐ: '+no+'</span>'
+    +'<span class="slip-serial">SỐ: '+H(no)+'</span>'
     +'<div class="slip-pm"><svg width="104" height="104" viewBox="0 0 110 110">'
       +'<circle cx="55" cy="55" r="52" fill="none" stroke="#93392C" stroke-width="1.5" stroke-dasharray="3.5 4"/>'
       +'<circle cx="55" cy="55" r="37" fill="none" stroke="#93392C" stroke-width="1"/>'
       +'<path id="pmRecArc'+p.id+'" d="M 55 11 A 44 44 0 1 1 54.96 11" fill="none"/>'
-      +'<text font-family="Be Vietnam Pro" font-size="9.5" font-weight="600" letter-spacing="2" fill="#93392C"><textPath href="#pmRecArc'+p.id+'" textLength="275" lengthAdjust="spacing">'+dstamp+' · TEDU · ĐÃ NHẬN ·</textPath></text>'
+      +'<text font-family="Be Vietnam Pro" font-size="9.5" font-weight="600" letter-spacing="2" fill="#93392C"><textPath href="#pmRecArc'+p.id+'" textLength="275" lengthAdjust="spacing">'+H(dstamp)+' · TEDU · ĐÃ NHẬN ·</textPath></text>'
       +'<text x="55" y="72" text-anchor="middle" font-family="Playfair Display" font-size="44" fill="#93392C">*</text>'
       +'</svg></div>'
     +'<div class="slip-brand">'+H((st.name||'TEdu').toUpperCase())+'</div>'
     +'<div class="slip-title">PHIẾU HỌC PHÍ</div>'
     +'<div class="slip-script">biên lai học phí</div>'
-    +'<div><span class="slip-chip" style="color:'+C+';background:'+C+'14">'+n+' buổi'+(sess.length?' · '+rangeLabel(sess):'')+(cls.length?' — '+H(cls[0].name):(s.subject?' — '+H(s.subject):''))+'</span></div>'
+    +'<div><span class="slip-chip" style="color:'+C+';background:'+C+'14">'+n+' buổi'+(sess.length?' · '+H(rangeLabel(sess)):'')+(cls.length?' — '+H(cls[0].name):(s.subject?' — '+H(s.subject):''))+'</span></div>'
     +'</div>';
   h+='<div class="slip-fleu">'+SLIP_FLEURON+'</div>';
   h+='<div class="slip-rows">'
@@ -3566,8 +3567,8 @@ function slipCardHTMLData(o,opt){
     +(s.grade?'<div class="slip-row"><span class="k">Lớp</span><span class="dots"></span><span class="v" style="font-weight:600;font-size:13px">'+H(s.grade)+'</span></div>':'')
     +'<div class="slip-row"><span class="k">Học phí mỗi buổi</span><span class="dots"></span><span class="v" style="font-weight:600;font-size:13px">'+fmtM(p.rate||s.rate)+'</span></div>'
     +'<div class="slip-row"><span class="k">Số buổi thanh toán</span><span class="dots"></span><span class="v" style="font-weight:600;font-size:13px">'+n+' buổi</span></div>'
-    +'<div class="slip-row"><span class="k">Ngày lập phiếu</span><span class="dots"></span><span class="v" style="font-weight:600;font-size:13px">'+fmtD(p.paidAt||todayStr())+'</span></div>'
-    +(p.paid&&p.collectedAt?'<div class="slip-row"><span class="k">Đã thu ngày</span><span class="dots"></span><span class="v" style="color:#2F5D50;font-weight:600;font-size:13px">'+fmtD(p.collectedAt)+'</span></div>':'')
+    +'<div class="slip-row"><span class="k">Ngày lập phiếu</span><span class="dots"></span><span class="v" style="font-weight:600;font-size:13px">'+H(fmtD(p.paidAt||todayStr()))+'</span></div>'
+    +(p.paid&&p.collectedAt?'<div class="slip-row"><span class="k">Đã thu ngày</span><span class="dots"></span><span class="v" style="color:#2F5D50;font-weight:600;font-size:13px">'+H(fmtD(p.collectedAt))+'</span></div>':'')
     +'</div>';
   h+='<div class="slip-total">'
     +'<div class="slip-tl">TỔNG THANH TOÁN</div>'
@@ -3577,15 +3578,15 @@ function slipCardHTMLData(o,opt){
     +'</div>';
   if(sess.length){
     h+='<div class="slip-sec">CÁC BUỔI TRONG PHIẾU NÀY</div><div class="slip-days">'
-      +sess.map(a=>'<span class="slip-day" style="color:'+C+';background:'+C+'0d">'+fmtDShort(a.date)+'</span>').join('')+'</div>';
+      +sess.map(a=>'<span class="slip-day" style="color:'+C+';background:'+C+'0d">'+H(fmtDShort(a.date))+'</span>').join('')+'</div>';
   }
   if(note)h+='<div class="slip-sec">NHẬN XÉT</div><div class="slip-note"><div>'+H(note)+'</div></div>';
   h+='<div class="slip-wish" style="text-align:center;font-family:\'Dancing Script\',cursive;font-weight:600;color:#6d6c5f;margin:15px 0;font-size:15px;line-height:1.5">Cảm ơn gia đình đã đồng hành cùng em!</div>';
   const bankLine=(st.bankId&&st.bankAcc)?('<div class="slip-bank">QUÉT ĐỂ THANH TOÁN<br>'+H(st.bankId.toUpperCase())+' '+H(st.bankAcc)+(st.bankHolder?' · '+H(st.bankHolder.toUpperCase()):'')+'</div>'):(st.bankInfo?'<div class="slip-bank">'+H(st.bankInfo)+'</div>':'');
   if(st.qrImage){
-    h+='<div class="slip-qrwrap"><div class="slip-qrmat"><img src="'+st.qrImage+'" alt="QR"></div>'+bankLine+'</div>';
+    h+='<div class="slip-qrwrap"><div class="slip-qrmat"><img src="'+H(st.qrImage)+'" alt="QR"></div>'+bankLine+'</div>';
   }else if(qr){
-    h+='<div class="slip-qrwrap"><div class="slip-qrmat"><img src="'+qr+'" alt="VietQR" onerror="this.parentNode.style.display=\'none\'"></div>'+bankLine+'</div>';
+    h+='<div class="slip-qrwrap"><div class="slip-qrmat"><img src="'+H(qr)+'" alt="VietQR" onerror="this.parentNode.style.display=\'none\'"></div>'+bankLine+'</div>';
   }else if(bankLine){
     h+='<div class="slip-qrwrap">'+bankLine+'</div>';
   }
