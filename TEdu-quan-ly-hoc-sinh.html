@@ -2720,6 +2720,7 @@ function attStatsHTML(){
 /* Học phí v3 — lưới buổi như Excel: trắng=chưa lập phiếu · vàng=chờ thu · xanh=đã thu */
 const feeOpen=new Set();      // học sinh đang mở lưới
 const feeSel={};              // sid -> Set(sessKey) đang tick để lập phiếu
+let ivConfirm=null;           // {sid,n} số buổi màn xác nhận ĐANG hiện — phiếu phải khớp đúng con số này
 function feeRowsAll(){
   return DB.students.map(s=>{
     const states=sessionStatesOf(s.id);
@@ -2754,7 +2755,9 @@ function renderFees(){
   }
   rows.forEach(r=>{
     const open=feeOpen.has(r.s.id);
-    const sel=feeSel[r.s.id]||new Set();
+    let sel=feeSel[r.s.id]||new Set();
+    /* Bỏ tick những buổi đã hết tính phí (sửa điểm danh) hoặc đã lên phiếu — nếu không, con số hiện ra sẽ lệch với phiếu */
+    if(sel.size){const ok=new Set(r.uninv.map(x=>x.key));const pr=new Set([...sel].filter(k=>ok.has(k)));if(pr.size!==sel.size)sel=feeSel[r.s.id]=pr;}
     const owedM=r.outstanding.length*(+r.s.rate||0);
     html+='<div class="card mt" style="padding:14px 16px">';
     html+='<div class="spread" style="cursor:pointer" onclick="feeToggle(\''+r.s.id+'\')">'
@@ -2850,6 +2853,7 @@ function openInvoiceConfirm(sid){
   const sel=feeSel[sid]||new Set();
   const keys=uninvoicedOf(sid).filter(x=>sel.has(x.key)).map(x=>x.key);
   if(!keys.length){toast('Tick ít nhất 1 buổi trên lưới trước đã');return;}
+  ivConfirm={sid:sid,n:keys.length};
   const list=keys.map(k=>({date:k.split('|')[0]})).sort((a,b)=>a.date.localeCompare(b.date));
   openModal(mHead('Lập phiếu – '+H(s.name))
     +'<div class="hint mb">Phiếu sẽ được <b>in ra để gửi phụ huynh</b>. Các buổi chuyển sang màu vàng "chờ thu" — khi nhận được tiền, bấm ✓ Đã thu trong Lịch sử hoặc trên phiếu.</div>'
@@ -2867,9 +2871,16 @@ function openInvoiceConfirm(sid){
 function confirmInvoice(sid){
   const s=studentById(sid); if(!s)return;
   const sel=feeSel[sid]||new Set();
-  const inv=invoiceMapOf(sid);
-  const keys=[...sel].filter(k=>!inv.has(k));
+  /* Lấy buổi từ ĐÚNG nguồn mà màn xác nhận đã hiện — không lấy thẳng từ feeSel, vì tick cũ có thể đã hết tính phí */
+  const keys=uninvoicedOf(sid).filter(x=>sel.has(x.key)).map(x=>x.key);
   if(!keys.length){toast('Các buổi này đã có phiếu');return;}
+  const shown=(ivConfirm&&ivConfirm.sid===sid)?ivConfirm.n:null;
+  if(shown!==null&&shown!==keys.length){
+    feeSel[sid]=new Set(keys); ivConfirm=null; closeModal(true); rerender();
+    toast('Số buổi vừa đổi ('+shown+' → '+keys.length+' buổi) — chưa lập phiếu, kiểm tra lại lưới rồi bấm lại');
+    return;
+  }
+  ivConfirm=null;
   const p={id:uid(),studentId:sid,sessionKeys:keys,sessions:keys.length,rate:+s.rate||0,
     amount:keys.length*(+s.rate||0),
     paid:false,collectedAt:'',
