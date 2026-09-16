@@ -103,3 +103,12 @@ chỉ vàng cắt ngang qua hoạ tiết; khung đó đã bỏ.
 
 Con dấu logo: hai vòng tròn của con dấu thường được thay bằng một vầng trăng vàng, dấu sách của TEdu
 giữ nguyên hình nhưng chuyển sang màu son để đọc được trên mặt trăng. Chỉ đổi trong dịp lễ.
+
+## Ô nhập, đầu bảng và phiếu học phí
+
+Ba bề mặt này lúc đầu bị bỏ sót nên nằm giữa trang sơn mài thì trơ ra. Đầu bảng nay dùng đúng biển
+tên của thẻ: nền son, chữ kem, dải châu ngọc chạy mép dưới. Phiếu học phí giữ nguyên cấu trúc tấm vé
+nhưng nhận mặt gấm hoa sen, khung vàng kép và tiêu đề màu son.
+
+Phiếu in ra vẫn trắng, khung đen, không hoa văn — phiếu là thứ đưa tận tay phụ huynh nên không được
+tốn mực và không được khó đọc.
