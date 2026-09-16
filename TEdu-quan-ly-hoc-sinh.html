@@ -813,7 +813,7 @@ body.th-trungthu .card:hover{border-color:#E8C16A;
 
 /* --- vùng cấm hoạ tiết: bảng, ô nhập, hộp thoại, băng thông báo, phiếu in --- */
 body.th-trungthu tbody,body.th-trungthu td,body.th-trungthu .modal,
-body.th-trungthu .banner,body.th-trungthu .ann-banner,body.th-trungthu .slip{
+body.th-trungthu .banner,body.th-trungthu .ann-banner{
   background-image:none}
 body.th-trungthu .modal,body.th-trungthu .banner,body.th-trungthu .ann-banner{
   background-color:var(--card);backdrop-filter:none;-webkit-backdrop-filter:none}
@@ -930,6 +930,77 @@ body.th-trungthu .tt-cart>div:nth-child(2){animation:ttGlow 3.6s ease-in-out inf
   body.th-trungthu .tt-cart>div:nth-child(2){font-size:19px!important;letter-spacing:.03em!important}
   body.th-trungthu .tt-cart>div:nth-child(3){font-size:10px!important}}
 @media print{body.th-trungthu .tt-plaque{display:none}}
+
+/* ================= Ô nhập, đầu bảng, phiếu học phí =================
+   Ba bề mặt này trước đây giữ nguyên màu kem trơn của bản thường nên nằm giữa trang sơn mài
+   thì trơ ra. */
+
+/* ô nhập và ô chọn: giấy ấm hơn, viền vàng, khi focus thì vàng đậm lên */
+body.th-trungthu input,body.th-trungthu select,body.th-trungthu textarea{
+  background-color:#FCF6E6;border-color:rgba(201,146,47,.55)}
+body.th-trungthu input:focus,body.th-trungthu select:focus,body.th-trungthu textarea:focus{
+  border-color:#C9922F;box-shadow:0 0 0 2px rgba(217,164,65,.22)}
+
+/* đầu bảng mang đúng biển tên của thẻ: nền son, chữ kem, dải châu ngọc chạy mép dưới */
+body.th-trungthu thead th{
+  position:relative;
+  background-color:#8E2118;background-image:var(--tt-band);background-size:150px 150px;
+  color:#FFF4DC;border-bottom-color:#D9A441}
+body.th-trungthu thead th::after{
+  content:'';position:absolute;left:0;right:0;bottom:0;height:6px;
+  background:var(--tt-jewel) repeat-x left bottom/auto 6px;opacity:.95}
+
+/* --- phiếu học phí --- */
+body.th-trungthu .slip{
+  background-color:#FBF5E4;background-image:var(--tt-diaper);background-size:150px 150px}
+body.th-trungthu .slip-frame{border-color:rgba(201,146,47,.9)}
+body.th-trungthu .slip-frame:before{border-color:rgba(122,29,24,.32)}
+body.th-trungthu .slip-frame svg{color:#C9922F}
+body.th-trungthu .slip-title{color:#8E2118}
+body.th-trungthu .slip-script{color:#B0782A}
+body.th-trungthu .slip-serial{border-color:rgba(122,29,24,.5)}
+/* dải châu ngọc ngăn phần đầu phiếu với phần nội dung */
+body.th-trungthu .slip-fleu{position:relative}
+body.th-trungthu .slip-fleu::after{
+  content:'';position:absolute;left:8%;right:8%;bottom:-6px;height:9px;
+  background:var(--tt-jewel) repeat-x center/auto 9px;opacity:.9}
+
+@media print{
+  /* phiếu đưa cho phụ huynh: in ra phải trắng, mực ít, không hoa văn */
+  body.th-trungthu .slip{background:#fff!important;background-image:none!important}
+  body.th-trungthu .slip-frame{border-color:#000!important}
+  body.th-trungthu .slip-frame:before{border-color:rgba(0,0,0,.45)!important}
+  body.th-trungthu .slip-title{color:#000!important}
+  body.th-trungthu .slip-fleu::after{display:none!important}
+  body.th-trungthu thead th{background:#fff!important;background-image:none!important;
+    color:#000!important;border-bottom-color:#000!important}
+  body.th-trungthu thead th::after{display:none!important}
+  body.th-trungthu input,body.th-trungthu select,body.th-trungthu textarea{
+    background:#fff!important;border-color:#000!important}}
+
+/* Bốn bề mặt còn lại giữ nguyên màu kem mặc định, tìm ra bằng cách quét mọi phần tử trong #app
+   xem cái nào còn đúng màu --card/--field mà không có hoa văn. */
+
+/* thẻ giáo án: cùng mặt gấm với thẻ lớn, viền vàng, bo góc theo bộ */
+body.th-trungthu .les-card{
+  background-color:#F8F0DC;background-image:var(--tt-diaper);background-size:150px 150px;
+  border-color:rgba(201,146,47,.5);border-radius:3px}
+
+/* ô ca học trong thời khoá biểu: giữ nguyên vạch màu lớp bên trái, chỉ ấm nền và thêm chỉ vàng */
+body.th-trungthu .ca-card{
+  background-color:#FBF4E2;background-image:var(--tt-diaper);background-size:120px 120px;
+  border-color:rgba(201,146,47,.45);border-radius:3px}
+
+/* khung kéo thả tệp */
+body.th-trungthu .dz{
+  background-color:#FCF6E6;border-color:rgba(201,146,47,.6);border-radius:3px}
+
+/* băng thông báo giữ nền đặc để chữ cảnh báo luôn rõ, chỉ nhận thêm viền vàng cho vào bộ */
+body.th-trungthu .banner{border-color:rgba(201,146,47,.7);border-radius:3px}
+
+@media print{
+  body.th-trungthu .les-card,body.th-trungthu .ca-card,body.th-trungthu .dz{
+    background:#fff!important;background-image:none!important;border-color:#000!important}}
 /* @@trungthu-extra-end */
 body.th-gioto{--btnpri:#B08A3C;--btnpri-ink:#33240F;--btnpri-bd:#7A5A20;--rope:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 40' preserveAspectRatio='none'%3E%3Cpath d='M0 6 Q150 30 300 12 T600 12 T900 12 T1200 6' fill='none' stroke='%23B08A3C' stroke-opacity='.85' stroke-width='2.4'/%3E%3C/svg%3E");--paper:#EDE1C8;--card:#F8F0DC;--panel:#DFCFA9;--field:#F9F3E2;--ink:#3A2A16;--inkr:58,42,22;--mut:#7C6A44;--mut2:#A89468;--rust:#8C3B1E;--rust-dark:#5A2410;--red:#8C3B1E;--grn:#4C6B3C;--grn-dark:#33502A;--grntx:#4C6B3C;--amb:#B07E2A;--gold:#B08A3C;--esp:#33240F;--cream:#F0E5C8;--line:rgba(58,42,22,.16);--line2:rgba(58,42,22,.3);--line3:rgba(58,42,22,.45);--navidle:#CBB78E;--navgrp:#A99070;--navcred:#8D765A;--navline:rgba(239,230,207,.16);--navhov:rgba(239,230,207,.07);--navbar:#C08A3A;--navonbg:#F0E5C8;--navonink:#3A2A16;--avbg:#E6D4AE;--avink:#6B5330;--onpaper:#3A2A16;--onpaper2:#7C6A44;--pat:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='110' height='110' viewBox='0 0 110 110'%3E%3Cg fill='none' stroke='%23B08A3C' stroke-opacity='.09' stroke-width='1.2'%3E%3Cpath d='M55 20l10 18H45zM55 90L45 72h20z'/%3E%3Ccircle cx='55' cy='55' r='13'/%3E%3C/g%3E%3C/svg%3E")}
 body.th-newyear{--btnpri:#C8A03A;--btnpri-ink:#161F30;--btnpri-bd:#8A6C18;--rope:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 40' preserveAspectRatio='none'%3E%3Cpath d='M0 6 Q150 30 300 12 T600 12 T900 12 T1200 6' fill='none' stroke='%23C8A03A' stroke-opacity='.85' stroke-width='2.4'/%3E%3C/svg%3E");--paper:#E9EDF2;--card:#F7F9FC;--panel:#DCE3EC;--field:#F9FBFD;--ink:#1F2B3E;--inkr:31,43,62;--mut:#5E6C82;--mut2:#93A0B2;--rust:#B0472F;--rust-dark:#6E2A1A;--red:#B0472F;--grn:#2E5B4B;--grn-dark:#1F4438;--grntx:#2E5B4B;--amb:#B08526;--gold:#B08D3F;--esp:#161F30;--cream:#EEF2F7;--line:rgba(31,43,62,.16);--line2:rgba(31,43,62,.3);--line3:rgba(31,43,62,.45);--navidle:#AEB9C8;--navgrp:#8592A4;--navcred:#71808F;--navline:rgba(239,230,207,.16);--navhov:rgba(239,230,207,.07);--navbar:#C8A03A;--navonbg:#EEF2F7;--navonink:#1F2B3E;--avbg:#DDE5EE;--avink:#4E5E74;--onpaper:#1F2B3E;--onpaper2:#5E6C82;--pat:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='110' height='110' viewBox='0 0 110 110'%3E%3Cg fill='none' stroke='%23B08D3F' stroke-opacity='.09' stroke-width='1.2'%3E%3Cpath d='M55 12v18M55 80v18M12 55h18M80 55h18'/%3E%3Ccircle cx='55' cy='55' r='9'/%3E%3C/g%3E%3C/svg%3E")}
