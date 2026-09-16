@@ -636,10 +636,6 @@ input[type=date].inp,input[type=month].inp,input[type=time].inp{padding:8px 10px
 .hol-b{margin:0 0 16px;padding:9px 14px;border:1.5px solid var(--gold);border-left:none;border-right:none;background:var(--card);display:flex;align-items:center;gap:10px;font-size:13.5px;letter-spacing:.02em;font-weight:600;color:var(--ink)}
 .hol-banner{position:relative;margin:0 0 16px;overflow:hidden;line-height:0}
 .hol-banner>div{width:100%!important;max-width:none!important}
-.hol-bx{position:absolute;top:8px;right:12px;z-index:9;cursor:pointer;color:#fff;opacity:.6;font-weight:800;font-size:17px;line-height:1;padding:2px 6px;background:rgba(0,0,0,.25);border-radius:50%}
-.hol-bx:hover{opacity:1}
-.hol-b .x{margin-left:auto;cursor:pointer;opacity:.45;font-weight:800;padding:0 6px;font-size:15px}
-.hol-b .x:hover{opacity:.9}
 .hol-b.th-tet{border-color:#93392C;background:linear-gradient(180deg,#93392C14,#93392C0a);color:#6d2118}
 .hol-b.th-trungthu{border-color:#D9A441;background:rgba(217,164,65,.12);color:#F4E7CB}
 .hol-b.th-noel{border-color:#2F5D50;background:#2F5D5012;color:#24463c}
@@ -683,7 +679,7 @@ body.th-noel{--btnpri:#8E3038;--btnpri-ink:#F7F4E8;--btnpri-bd:#5E1C22;--rope:ur
 body.th-halloween{--btnpri:#B4531B;--btnpri-ink:#F3E6CF;--btnpri-bd:#7A3510;--rope:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 40' preserveAspectRatio='none'%3E%3Cpath d='M0 6 Q150 30 300 12 T600 12 T900 12 T1200 6' fill='none' stroke='%23B4531B' stroke-opacity='.85' stroke-width='2.4'/%3E%3C/svg%3E");--grntx:#4A6B37;--paper:#EAD8B8;--card:#F3E6CF;--panel:#E2CFAC;--field:#F6ECD9;--ink:#241B2C;--inkr:36,27,44;--mut:#6E6456;--mut2:#9A9082;--rust:#B4531B;--rust-dark:#7A3510;--red:#B4531B;--grn:#4A6B37;--grn-dark:#33502A;--amb:#9A6B24;--gold:#9A7B34;--esp:#1E1626;--cream:#F3E6CF;--line:rgba(36,27,44,.16);--line2:rgba(36,27,44,.32);--line3:rgba(36,27,44,.46);--navidle:#AAA096;--navgrp:#8A7A6E;--navcred:#6E6456;--navline:rgba(180,83,27,.28);--navhov:rgba(243,230,207,.07);--navbar:#B4531B;--navonbg:#F3E6CF;--navonink:#241B2C;--avbg:#E5D3B2;--avink:#6B5A42;--pat:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='104' height='104' viewBox='0 0 104 104'%3E%3Cg fill='%23241B2C' fill-opacity='.05'%3E%3Ccircle cx='20' cy='24' r='2'/%3E%3Ccircle cx='78' cy='44' r='1.4'/%3E%3Ccircle cx='46' cy='84' r='1.8'/%3E%3C/g%3E%3Cg fill='none' stroke='%23B4531B' stroke-opacity='.07' stroke-width='1.2'%3E%3Cpath d='M8 60q14-12 28 0t28 0 28 0'/%3E%3C/g%3E%3C/svg%3E");--onpaper:#241B2C;--onpaper2:#6E6456}
 body.th-nhagiao{--btnpri:#A23B2C;--btnpri-ink:#F9F7EC;--btnpri-bd:#6E2418;--rope:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 40' preserveAspectRatio='none'%3E%3Cpath d='M0 6 Q150 30 300 12 T600 12 T900 12 T1200 6' fill='none' stroke='%237A5A33' stroke-opacity='.85' stroke-width='2.4'/%3E%3C/svg%3E");--grntx:#2E5B4B;--paper:#F2EFE3;--card:#F9F7EC;--panel:#E7E2CE;--field:#FAF8EF;--ink:#253C52;--inkr:37,60,82;--mut:#5E6C77;--mut2:#93958A;--rust:#A23B2C;--rust-dark:#6E2418;--red:#A23B2C;--grn:#2E5B4B;--grn-dark:#1F4438;--amb:#9C7B3C;--gold:#9C7B3C;--esp:#263F37;--cream:#F9F7EC;--line:rgba(37,60,82,.16);--line2:rgba(37,60,82,.3);--line3:rgba(37,60,82,.44);--navidle:#C2CFC2;--navgrp:#93A697;--navcred:#7E9182;--navline:rgba(237,232,213,.18);--navhov:rgba(242,239,227,.07);--navbar:#A23B2C;--navonbg:#F2EFE3;--navonink:#253C52;--avbg:#E7E2CE;--avink:#4E6478;--pat:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cg fill='%23253C52' fill-opacity='.05'%3E%3Ccircle cx='30' cy='50' r='1.4'/%3E%3Ccircle cx='120' cy='24' r='1'/%3E%3Ccircle cx='160' cy='100' r='1.4'/%3E%3Ccircle cx='70' cy='140' r='1'/%3E%3C/g%3E%3C/svg%3E");--onpaper:#253C52;--onpaper2:#5E6C77}
 body.th-bday{--btnpri:#A94F5E;--btnpri-ink:#FBF1E3;--btnpri-bd:#6E2E37;--rope:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 40' preserveAspectRatio='none'%3E%3Cpath d='M0 6 Q150 30 300 12 T600 12 T900 12 T1200 6' fill='none' stroke='%23BB8A3F' stroke-opacity='.85' stroke-width='2.4'/%3E%3C/svg%3E");--paper:#F6EBDB;--card:#FBF4E6;--panel:#F1DFCE;--field:#FDF7EC;--ink:#3B241E;--inkr:59,36,30;--mut:#8A6F62;--mut2:#B29A8B;--rust:#A03D2C;--rust-dark:#6E2418;--red:#9C4655;--grn:#6B7C58;--grn-dark:#4A5A3C;--grntx:#6B7C58;--amb:#B07A22;--gold:#BB8A3F;--esp:#2C1815;--cream:#F3E3D0;--line:rgba(59,36,30,.16);--line2:rgba(59,36,30,.3);--line3:rgba(59,36,30,.46);--navidle:#C7AE9F;--navgrp:#A98C7C;--navcred:#8E7263;--navline:rgba(243,227,208,.16);--navhov:rgba(243,227,208,.07);--navbar:#C4707C;--navonbg:#F3E3D0;--navonink:#3B241E;--avbg:#F5D9CE;--avink:#8E5462;--onpaper:#3B241E;--onpaper2:#8A6F62;--pat:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%23C4707C' stroke-opacity='.10' stroke-width='1.2'%3E%3Cpath d='M60 44c-7-9-19-6-19 4s12 17 19 24c7-7 19-14 19-24s-12-13-19-4z'/%3E%3Ccircle cx='18' cy='96' r='3'/%3E%3Ccircle cx='102' cy='24' r='3'/%3E%3C/g%3E%3C/svg%3E")}
-body.th-trungthu{--sky:#33506B;--btnpri:#D9A441;--btnpri-ink:#241505;--btnpri-bd:#8A5C1A;--rope:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 40' preserveAspectRatio='none'%3E%3Cpath d='M0 6 Q150 30 300 12 T600 12 T900 12 T1200 6' fill='none' stroke='%23D9A441' stroke-opacity='.85' stroke-width='2.4'/%3E%3C/svg%3E");--grntx:#2A6040;--paper:#14263C;--card:#F4E7CB;--panel:#EBDDBC;--field:#FBF4E2;--ink:#2B2318;--inkr:43,35,24;--mut:#6F6046;--mut2:#665940;--rust:#A8362A;--rust-dark:#7A2418;--red:#AD3527;--grn:#3F6B4A;--grn-dark:#2A4A33;--amb:#805410;--gold:#D9A441;--esp:#0E1B2B;--cream:#F4E7CB;--line:rgba(43,35,24,.16);--line2:rgba(43,35,24,.3);--line3:rgba(43,35,24,.45);--navidle:#B9B39C;--navgrp:#8E8A70;--navcred:#7E7A63;--navline:rgba(217,164,65,.22);--navhov:rgba(244,231,203,.07);--navbar:#D9A441;--navonbg:#F4E7CB;--navonink:#14263C;--avbg:#E6C88F;--avink:#4A2E14;--pat:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='%23F4E7CB'%3E%3Ccircle cx='18' cy='22' r='1.1' fill-opacity='.14'/%3E%3Ccircle cx='71' cy='9' r='.8' fill-opacity='.11'/%3E%3Ccircle cx='103' cy='47' r='1.3' fill-opacity='.13'/%3E%3Ccircle cx='46' cy='78' r='.9' fill-opacity='.10'/%3E%3Ccircle cx='88' cy='104' r='1' fill-opacity='.12'/%3E%3C/g%3E%3Cpath d='M30 106 l1.4 3.2 3.2 1.4-3.2 1.4-1.4 3.2-1.4-3.2-3.2-1.4 3.2-1.4z' fill='%23E2B45C' fill-opacity='.12'/%3E%3Cpath d='M58 40c-6 0-8-8-1-9c1-7 12-7 14-1c8-3 14 5 9 11' fill='none' stroke='%23D9A441' stroke-opacity='.07' stroke-width='1.1'/%3E%3C/svg%3E");--onpaper:#F4E7CB;--onpaper2:#C9B893}
+body.th-trungthu{--sky:#33506B;--btnpri:#D9A441;--btnpri-ink:#241505;--btnpri-bd:#8A5C1A;--rope:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 40' preserveAspectRatio='none'%3E%3Cpath d='M0 6 Q150 30 300 12 T600 12 T900 12 T1200 6' fill='none' stroke='%23D9A441' stroke-opacity='.85' stroke-width='2.4'/%3E%3C/svg%3E");--grntx:#255539;--paper:#14263C;--card:#F4E7CB;--panel:#EBDDBC;--field:#FBF4E2;--ink:#2B2318;--inkr:43,35,24;--mut:#5C503A;--mut2:#5C503A;--rust:#922F25;--rust-dark:#6B1F14;--red:#982F22;--grn:#3F6B4A;--grn-dark:#2A4A33;--amb:#6F490E;--gold:#D9A441;--esp:#0E1B2B;--cream:#F4E7CB;--line:rgba(43,35,24,.16);--line2:rgba(43,35,24,.3);--line3:rgba(43,35,24,.45);--navidle:#B9B39C;--navgrp:#8E8A70;--navcred:#7E7A63;--navline:rgba(217,164,65,.22);--navhov:rgba(244,231,203,.07);--navbar:#D9A441;--navonbg:#F4E7CB;--navonink:#14263C;--avbg:#E6C88F;--avink:#4A2E14;--pat:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='%23F4E7CB'%3E%3Ccircle cx='18' cy='22' r='1.1' fill-opacity='.14'/%3E%3Ccircle cx='71' cy='9' r='.8' fill-opacity='.11'/%3E%3Ccircle cx='103' cy='47' r='1.3' fill-opacity='.13'/%3E%3Ccircle cx='46' cy='78' r='.9' fill-opacity='.10'/%3E%3Ccircle cx='88' cy='104' r='1' fill-opacity='.12'/%3E%3C/g%3E%3Cpath d='M30 106 l1.4 3.2 3.2 1.4-3.2 1.4-1.4 3.2-1.4-3.2-3.2-1.4 3.2-1.4z' fill='%23E2B45C' fill-opacity='.12'/%3E%3Cpath d='M58 40c-6 0-8-8-1-9c1-7 12-7 14-1c8-3 14 5 9 11' fill='none' stroke='%23D9A441' stroke-opacity='.07' stroke-width='1.1'/%3E%3C/svg%3E");--onpaper:#F4E7CB;--onpaper2:#C9B893}
 /* @@trungthu-extra-start */
 body.th-trungthu .empty .big,body.th-trungthu .g-demo .s-demo,body.th-trungthu .gcf{color:#8A5C1A}
 body.th-trungthu #holGarland{z-index:2}
@@ -724,6 +720,20 @@ body.th-trungthu .page>.cls-sec-label,body.th-trungthu .page>.hint{color:var(--o
 body.th-trungthu #landing{background:var(--card);color:var(--ink)}
 /* garland row + rope stop short of the top-right corner piece (it hangs there like the Tết mai branch) */
 @media(min-width:901px){body.th-trungthu #holGarland{padding-right:calc(4% + 120px)}body.th-trungthu #holGarland::before{right:112px}}
+
+/* ===== Thẻ giấy điệp mờ: thấy lồng đèn / hoạ tiết phía sau nhưng chữ vẫn đọc rõ ===== */
+body.th-trungthu .card,body.th-trungthu .stat{
+  background:linear-gradient(180deg,rgba(247,236,211,.93),rgba(240,226,197,.9));
+  backdrop-filter:blur(3px) saturate(1.04);-webkit-backdrop-filter:blur(3px) saturate(1.04);
+  border-color:rgba(217,164,65,.5)}
+body.th-trungthu .card::after{content:'';position:absolute;inset:0;pointer-events:none;
+  box-shadow:inset 0 0 0 1px rgba(244,231,203,.35)}
+/* hộp thoại, băng thông báo và phiếu giữ nền đặc — chữ dày, không được mờ */
+body.th-trungthu .modal,body.th-trungthu .banner,body.th-trungthu .ann-banner{
+  background:var(--card);backdrop-filter:none;-webkit-backdrop-filter:none}
+@media print{body.th-trungthu .card,body.th-trungthu .stat{background:#fff;backdrop-filter:none}}
+/* nhãn ca học mang màu lớp do giáo viên tự chọn — nền sáng hơn để màu đó còn đọc được trên thẻ mờ */
+body.th-trungthu .tag{background:rgba(255,253,245,.62)!important}
 /* @@trungthu-extra-end */
 body.th-gioto{--btnpri:#B08A3C;--btnpri-ink:#33240F;--btnpri-bd:#7A5A20;--rope:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 40' preserveAspectRatio='none'%3E%3Cpath d='M0 6 Q150 30 300 12 T600 12 T900 12 T1200 6' fill='none' stroke='%23B08A3C' stroke-opacity='.85' stroke-width='2.4'/%3E%3C/svg%3E");--paper:#EDE1C8;--card:#F8F0DC;--panel:#DFCFA9;--field:#F9F3E2;--ink:#3A2A16;--inkr:58,42,22;--mut:#7C6A44;--mut2:#A89468;--rust:#8C3B1E;--rust-dark:#5A2410;--red:#8C3B1E;--grn:#4C6B3C;--grn-dark:#33502A;--grntx:#4C6B3C;--amb:#B07E2A;--gold:#B08A3C;--esp:#33240F;--cream:#F0E5C8;--line:rgba(58,42,22,.16);--line2:rgba(58,42,22,.3);--line3:rgba(58,42,22,.45);--navidle:#CBB78E;--navgrp:#A99070;--navcred:#8D765A;--navline:rgba(239,230,207,.16);--navhov:rgba(239,230,207,.07);--navbar:#C08A3A;--navonbg:#F0E5C8;--navonink:#3A2A16;--avbg:#E6D4AE;--avink:#6B5330;--onpaper:#3A2A16;--onpaper2:#7C6A44;--pat:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='110' height='110' viewBox='0 0 110 110'%3E%3Cg fill='none' stroke='%23B08A3C' stroke-opacity='.09' stroke-width='1.2'%3E%3Cpath d='M55 20l10 18H45zM55 90L45 72h20z'/%3E%3Ccircle cx='55' cy='55' r='13'/%3E%3C/g%3E%3C/svg%3E")}
 body.th-newyear{--btnpri:#C8A03A;--btnpri-ink:#161F30;--btnpri-bd:#8A6C18;--rope:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 40' preserveAspectRatio='none'%3E%3Cpath d='M0 6 Q150 30 300 12 T600 12 T900 12 T1200 6' fill='none' stroke='%23C8A03A' stroke-opacity='.85' stroke-width='2.4'/%3E%3C/svg%3E");--paper:#E9EDF2;--card:#F7F9FC;--panel:#DCE3EC;--field:#F9FBFD;--ink:#1F2B3E;--inkr:31,43,62;--mut:#5E6C82;--mut2:#93A0B2;--rust:#B0472F;--rust-dark:#6E2A1A;--red:#B0472F;--grn:#2E5B4B;--grn-dark:#1F4438;--grntx:#2E5B4B;--amb:#B08526;--gold:#B08D3F;--esp:#161F30;--cream:#EEF2F7;--line:rgba(31,43,62,.16);--line2:rgba(31,43,62,.3);--line3:rgba(31,43,62,.45);--navidle:#AEB9C8;--navgrp:#8592A4;--navcred:#71808F;--navline:rgba(239,230,207,.16);--navhov:rgba(239,230,207,.07);--navbar:#C8A03A;--navonbg:#EEF2F7;--navonink:#1F2B3E;--avbg:#DDE5EE;--avink:#4E5E74;--onpaper:#1F2B3E;--onpaper2:#5E6C82;--pat:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='110' height='110' viewBox='0 0 110 110'%3E%3Cg fill='none' stroke='%23B08D3F' stroke-opacity='.09' stroke-width='1.2'%3E%3Cpath d='M55 12v18M55 80v18M12 55h18M80 55h18'/%3E%3Ccircle cx='55' cy='55' r='9'/%3E%3C/g%3E%3C/svg%3E")}
@@ -6578,30 +6588,24 @@ function applyHolidayTheme(dateOpt){
   deco.id='holDeco';deco.textContent=meta.deco;
   document.body.appendChild(deco);
   holFxMake(meta.fx,meta.dir,h.key);
-  const y=(dateOpt||todayStr()).slice(0,4);
-  let dis=false; try{dis=!!localStorage.getItem('tedu_hol_'+h.key+y);}catch(e){}
-  if(!dis){
-    const m=document.querySelector('#app main');
-    if(m){
-      const div=document.createElement('div');
-      div.id='holidayBanner';
-      if(typeof THEME_BANNER!=='undefined'&&THEME_BANNER[h.key]){
-        div.className='hol-banner th-'+h.key;
-        div.innerHTML=bannerFill(THEME_BANNER[h.key],h.key,dateOpt)+'<span class="hol-bx" data-tip="Ẩn banner (theme vẫn giữ)" onclick="holDismiss(\''+h.key+'\',\''+y+'\')">×</span>';
-      }else{
-        div.className='hol-b th-'+h.key;
-        div.innerHTML='<span>'+meta.g+'</span><span class="x" data-tip="Ẩn lời chúc (không hiện lại trong dịp này; theme vẫn giữ)" onclick="holDismiss(\''+h.key+'\',\''+y+'\')">×</span>';
-      }
-      m.insertBefore(div,m.firstChild);
+  /* Băng chúc luôn hiện trong dịp lễ — không còn nút tắt (Founder 2026-09-16: lỡ tắt là không bật lại được).
+     Muốn tắt hết trang trí thì bỏ chọn “Theme ngày lễ tự động” trong Cài đặt. */
+  const m=document.querySelector('#app main');
+  if(m){
+    const div=document.createElement('div');
+    div.id='holidayBanner';
+    if(typeof THEME_BANNER!=='undefined'&&THEME_BANNER[h.key]){
+      div.className='hol-banner th-'+h.key;
+      div.innerHTML=bannerFill(THEME_BANNER[h.key],h.key,dateOpt);
+    }else{
+      div.className='hol-b th-'+h.key;
+      div.innerHTML='<span>'+meta.g+'</span>';
     }
+    m.insertBefore(div,m.firstChild);
   }
   holGarlandMake(meta.gar,h.key);
   themeDecoMake(h.key);
   return h.key;
-}
-function holDismiss(k,y){
-  try{localStorage.setItem('tedu_hol_'+k+y,'1');}catch(e){}
-  const b=document.getElementById('holidayBanner'); if(b)b.remove();
 }
 /* ========== SINH NHẬT CÁ NHÂN HOÁ ========== */
 /* Tranh vẽ vintage riêng cho Diễm Quỳnh — tóc dài, bó hoa pastel */
