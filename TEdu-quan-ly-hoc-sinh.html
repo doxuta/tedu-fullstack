@@ -823,6 +823,8 @@ body.th-trungthu .modal,body.th-trungthu .banner,body.th-trungthu .ann-banner{
   body.th-trungthu #app main::after{display:none!important}
   body.th-trungthu .card,body.th-trungthu .stat{background:#fff!important;background-image:none!important;
     backdrop-filter:none!important;border-color:#000!important;border-left-width:1px!important}
+  /* dải chân thẻ bị ẩn khi in, nên trả lại lề đã dành cho nó — nếu không mỗi thẻ in ra thừa 72px giấy trắng */
+  body.th-trungthu .card:has(>h3:first-child){padding-bottom:20px!important}
   /* biển tên son sẽ in ra thành một vệt đặc nếu không gỡ — phiếu học phí đi qua đường này */
   body.th-trungthu .card>h3:first-child{background:none!important;color:#000!important;
     margin:0 0 13px!important;padding:0 0 11px!important;border-bottom:1px solid #000!important}
