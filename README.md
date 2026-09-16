@@ -60,7 +60,7 @@ chat giáo viên ↔ admin có báo email. Ba ngôn ngữ VI / EN / 한국어. C
 ### Theme Tết Nguyên Đán — giấy đỏ son, câu đối, mai vàng
 ![Theme Tết](docs/screenshots/theme-tet.png)
 
-### Theme Trung thu — đêm rằm, trăng chú Cuội – cây đa, rước đèn ông sao, thẻ giấy kem
+### Theme Trung thu — nền sơn mài gấm vàng, hoành phi rước đèn, thẻ giấy gấm hoa sen
 ![Theme Trung thu](docs/screenshots/theme-trungthu.png)
 
 ### Theme Noel — giấy ngà, dải thông, tuyết rơi
