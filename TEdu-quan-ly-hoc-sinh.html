@@ -3889,7 +3889,7 @@ function renderSettings(){
     +'<div><label class="lb">Tên hiển thị (gia sư / lớp)</label><input class="inp" value="'+H(st.name)+'" onchange="setS(\'name\',this.value.trim())"></div>'
     +'<div><label class="lb">Đơn giá mặc định / buổi (đ)</label><input class="inp" type="number" step="10000" min="0" value="'+(+st.defaultRate||0)+'" onchange="setS(\'defaultRate\',+this.value||0)"></div>'
     +'<div class="full"><label class="flex" style="cursor:pointer;gap:8px"><input type="checkbox" '+(st.chargeUnexcused?'checked':'')+' onchange="setS(\'chargeUnexcused\',this.checked);rerender()"> <span><b>Tính phí cả buổi vắng không phép</b> <span class="muted small">— bật nếu bạn vẫn thu tiền buổi vắng KP</span></span></label></div>'
-  +'<div class="full"><label class="flex" style="cursor:pointer;gap:8px"><input type="checkbox" '+(st.holidayTheme!==false?'checked':'')+' onchange="setS(\'holidayTheme\',this.checked);applyFestive()"> <span><b>Theme ngày lễ tự động</b> <span class="muted small">— Tết cả tháng 🧧 · Trung thu cả tuần 🏮 · 20/11 · Noel · 2/9 · Giỗ Tổ… mỗi lễ một bản sắc riêng</span></span></label></div>'
+  +'<div class="full"><label class="flex" style="cursor:pointer;gap:8px"><input type="checkbox" '+(st.holidayTheme!==false?'checked':'')+' onchange="setS(\'holidayTheme\',this.checked);applyFestive()"> <span><b>Theme ngày lễ tự động</b> <span class="muted small">— Tết cả tháng 🧧 · Trung thu 10 ngày trước rằm 🏮 · 20/11 · Noel · 2/9 · Giỗ Tổ… mỗi lễ một bản sắc riêng</span></span></label></div>'
     +'</div></div>';
   html+='<div class="card"><h3>'+ic('credit-card')+' Thanh toán &amp; phiếu học phí</h3><div class="fg">'
     +'<div><label class="lb">Mã ngân hàng</label><input class="inp" value="'+H(st.bankId)+'" placeholder="VD: BIDV, VCB, TCB, MB, ACB" onchange="setS(\'bankId\',this.value.trim())"></div>'
@@ -6464,7 +6464,8 @@ function activeHoliday(dateStr){
     const tD=tetOf(yy),ttD=trungthuOf(yy),gD=giotoOf(yy);
     /* Tết: vào không khí từ 20 tháng Chạp → hết rằm tháng Giêng */
     if(tD)W.push({key:'tet',from:(lunarToISO(20,12,yy-1)||dAdd(tD,-10)),to:dAdd(tD,15)});
-    if(ttD)W.push({key:'trungthu',from:dAdd(ttD,-3),to:dAdd(ttD,3)});
+    /* Trung thu: vào không khí 10 ngày trước rằm tháng Tám → tự tắt 3 ngày sau rằm */
+    if(ttD)W.push({key:'trungthu',from:dAdd(ttD,-10),to:dAdd(ttD,3)});
     if(gD)W.push({key:'gioto',from:dAdd(gD,-1),to:dAdd(gD,1)});
     W.push({key:'valentine',from:yy+'-02-13',to:yy+'-02-14'});
     W.push({key:'giadinh',from:yy+'-06-28',to:yy+'-06-28'});
