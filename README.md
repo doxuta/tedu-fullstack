@@ -63,6 +63,9 @@ chat giáo viên ↔ admin có báo email. Ba ngôn ngữ VI / EN / 한국어. C
 ### Theme Trung thu — nền sơn mài gấm vàng, hoành phi rước đèn, thẻ giấy gấm hoa sen
 ![Theme Trung thu](docs/screenshots/theme-trungthu.png)
 
+### Theme 20/10 — nhung hồng thêu kim tuyến, phượng và vườn hồng Tố nữ, thiệp thư tay
+![Theme 20/10](docs/screenshots/theme-phunu2010.png)
+
 ### Theme Noel — giấy ngà, dải thông, tuyết rơi
 ![Theme Noel](docs/screenshots/theme-noel.png)
 
